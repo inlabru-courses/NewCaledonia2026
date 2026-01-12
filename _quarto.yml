@@ -1,27 +1,36 @@
 project:
   type: website
-  output-dir: docs
-  
+  render: 
+    - index.qmd
+    - Install_software.qmd
+    - slides/slides_1.qmd
+    - practicals/LMM_ex.qmd
 website:
-  title: "MY WEB SITE"
+  title: "inlabru_NewCaledonia"
   navbar:
+    logo: Image/INLA_logo.png
+    right:
+      - text: "Home"
+        href: index.qmd
     left:
-      - href: index.qmd
-        text: Home
-      - projects.qmd
-    tools:
-      - icon: twitter
-        href: https://twitter.com/
-      - icon: github
-        href: https://github.com/YOURUSERNAME/YOURREPO
-  page-footer:
-    right: "Built with [Quarto](https://quarto.org/)"
-    left: "&copy; Copyright 2023, YOUR NAME"
+      - text: "Installation"
+        href: Install_software.qmd
+      - text: "Slides"
+        menu:
+          - text: "Slides 1 - Introduction"
+            href: slides/slides_1.qmd
+      - text: "Practicals"
+        menu:
+          - text: "Practical 1 - Fit LMM"
+            href: practicals/LMM_ex.qmd
 
 format:
-  html:
-    theme: cerulean
-    toc: true
-
-editor: source
+  revealjs:
+    footer: "<a href='../index.html'>Back to Home</a>"
+        
+publish:
+  gh-pages:
+    branch: gh-pages
+execute:
+  freeze: auto
 

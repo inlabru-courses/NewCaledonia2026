@@ -1,19 +1,64 @@
 ---
-title: "About Me"
-about:
-  id: me
-  template: broadside
-  image: img/profile.png
+title: "`inlabru` Workshop"
+author: "Jafet Belmont, Sara Martino and Janine Illian"
+subtitle: ""
+format: 
+  html:
+    mainfont: "12"
+  PrettyPDF-pdf:
+    keep-tex:  true
+    number-sections: true
+editor_options: 
+  chunk_output_type: console
 ---
 
-:::{#me}
+# Welcome to the course!
 
-## Goals
+-   Welcome to the `inlabru` workshop!
+-   The aim of this workshop is to introduce you to a range of statistical modelling approaches, in particular the temporal, spatial and spatio-temporal modelling as implemented in the `inlabru` package.
+-   Workshop materials are available in the github repository
+-   ⚠️**Important!** ⚠️ Please use the instructions provided [here](Install_software.qmd) to install and check your installation *before* the course start.
 
-## Education
+# Learning Objectives for the workshop
 
-## Experience
+At the end of the workshop, participants will have an understanding of:
 
+-   the motivation for and the challenges of analysing and modelling spatial data
+-   statistical models used to analyse spatial and spatio-temporal data
+-   the implementation of these models in the `inlabru` package
+-   how to independently analyse spatial data with `inlabru`
+
+# Intended audience
+
+The workshop aims to cater for participants with a range of different backgrounds, who is interested in analysing data with modern spatial and spatio-temporal statistical modelling approaches.
+
+# Prerequisites
+
+Participants should be familiar with the `R` environment, and general statistical approaches for modelling such as regression, analysis of (co)variance, and generalized linear models.​
+
+No knowledge of `R-INLA` or `inlabru` is required.
+
+# Schedule {#schedule-tabs}
+
+::: panel-tabset
+### Day 1
+
+: {.striped .hover}
+
+### Day 2
+
+: {.striped .hover}
+
+### Day 3
+
+: {.striped .hover}
+
+### Day 4
+
+: {.striped .hover}
+
+### Day 5
+
+: {.striped .hover}
 :::
 
-Thanks for checking out my web site!
