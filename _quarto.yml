@@ -1,21 +1,23 @@
 project:
   type: website
   output-dir: docs
-  
-  render: 
+
+  render:
     - index.qmd
     - Install_software.qmd
     - slides/slides_1.qmd
     - practicals/LMM_ex.qmd
-    
 website:
   title: "inlabru_NewCaledonia"
   navbar:
     logo: Image/INLA_logo.png
     right:
+      - text: "GitHub"
+        href: https://github.com/inlabru-courses/NewCaledonia2026   # replace ORG/REPO with your repo URL
+        icon: brands/github   # optional: shows GitHub icon
+    left:
       - text: "Home"
         href: index.qmd
-    left:
       - text: "Installation"
         href: Install_software.qmd
       - text: "Slides"
@@ -27,10 +29,9 @@ website:
           - text: "Practical 1 - Fit LMM"
             href: practicals/LMM_ex.qmd
 
+
 format:
-  revealjs:
-    footer: "<a href='../index.html'>Back to Home</a>"
-        
+  html: {}
 
 execute:
   freeze: auto

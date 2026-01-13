@@ -275,7 +275,7 @@
 \@ifundefined{codebgcolor}{\definecolor{codebgcolor}{named}{light}}{}
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, frame hidden, boxrule=0pt, colback={codebgcolor}, enhanced, breakable]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, boxrule=0pt, enhanced, frame hidden, colback={codebgcolor}, breakable]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -304,7 +304,7 @@ installation.
 
 If you run into issues, you can post a question with information about
 what you tried and what didn't work, on the
-\href{https://github.com/smar-git/inlabru_newCaledonia/discussions}{course
+\href{https://github.com/inlabru-courses/NewCaledonia2026/discussions}{course
 github discussion page} and we will try reply.
 
 Since 29 April 2025, the latest INLA package is built for R 4.5, so if
@@ -387,18 +387,18 @@ You can check that \texttt{INLA} is correctly installed by running
 
 \begin{verbatim}
 Time used:
-    Pre = 1.04, Running = 0.195, Post = 0.00976, Total = 1.25 
+    Pre = 0.942, Running = 0.186, Post = 0.00853, Total = 1.14 
 Fixed effects:
-             mean    sd 0.025quant 0.5quant 0.975quant  mode kld
-(Intercept) 9.983 0.104      9.778    9.983     10.188 9.983   0
+              mean    sd 0.025quant 0.5quant 0.975quant   mode kld
+(Intercept) 10.061 0.099      9.865   10.061     10.256 10.061   0
 
 Model hyperparameters:
-                                         mean    sd 0.025quant 0.5quant
-Precision for the Gaussian observations 0.934 0.131      0.695    0.928
-                                        0.975quant  mode
-Precision for the Gaussian observations       1.21 0.916
+                                        mean    sd 0.025quant 0.5quant
+Precision for the Gaussian observations 1.03 0.144      0.764     1.02
+                                        0.975quant mode
+Precision for the Gaussian observations       1.33 1.01
 
-Marginal log-Likelihood:  -158.15 
+Marginal log-Likelihood:  -153.39 
  is computed 
 Posterior summaries for the linear predictor and the fitted values are computed
 (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
@@ -436,18 +436,18 @@ Observation models:
     Additive/Linear: TRUE/TRUE
     Used components: effects[Intercept], latent[] 
 Time used:
-    Pre = 1.71, Running = 0.192, Post = 0.0128, Total = 1.92 
+    Pre = 0.891, Running = 0.195, Post = 0.0127, Total = 1.1 
 Fixed effects:
-           mean    sd 0.025quant 0.5quant 0.975quant  mode kld
-Intercept 9.983 0.104      9.778    9.983     10.188 9.983   0
+            mean    sd 0.025quant 0.5quant 0.975quant   mode kld
+Intercept 10.061 0.099      9.865   10.061     10.256 10.061   0
 
 Model hyperparameters:
-                                         mean    sd 0.025quant 0.5quant
-Precision for the Gaussian observations 0.934 0.131      0.695    0.928
-                                        0.975quant  mode
-Precision for the Gaussian observations       1.21 0.916
+                                        mean    sd 0.025quant 0.5quant
+Precision for the Gaussian observations 1.03 0.144      0.764     1.02
+                                        0.975quant mode
+Precision for the Gaussian observations       1.33 1.01
 
-Marginal log-Likelihood:  -162.62 
+Marginal log-Likelihood:  -157.85 
  is computed 
 Posterior summaries for the linear predictor and the fitted values are computed
 (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')
