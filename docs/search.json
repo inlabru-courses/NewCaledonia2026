@@ -28,34 +28,6 @@
     "text": "Linear Mixed Model\nFinally we are going to consider a simple linear mixed model, that is a simple linear regression model except with the addition that the data that comes in groups.\nSuppose that we want to include a random effect for each group \\(j\\) (equivalent to adding a group random intercept). The model is then:\n\\[\ny_{ij}  = \\beta_0 + \\beta_1 x_i + u_j + \\epsilon_{ij} ~~~  \\text{for}~i = 1,\\ldots,N~ \\text{and}~ j = 1,\\ldots,m.\n\\]\nHere the random group effect is given by the variable \\(u_j \\sim \\mathcal{N}(0, \\tau^{-1}_u)\\) with \\(\\tau_u = 1/\\sigma^2_u\\) describing the variability between groups (i.e., how much the group means differ from the overall mean). Then, \\(\\epsilon_j \\sim \\mathcal{N}(0, \\tau^{-1}_\\epsilon)\\) denotes the residuals of the model and \\(\\tau_\\epsilon = 1/\\sigma^2_\\epsilon\\) captures how much individual observations deviate from their group mean (i.e., variability within group).\nThe model design matrix for the random effect has one row for each observation (this is equivalent to a random intercept model). The row of the design matrix associated with the \\(ij\\)-th observation consists of zeros except for the element associated with \\(u_j\\), which has a one.\n\\[\n\\pmb{\\eta} = \\pmb{A}\\pmb{u} = \\pmb{A}_1\\pmb{u}_1 + \\pmb{A}_2\\pmb{u}_2 + \\pmb{A}_3\\pmb{u}_3\n\\]\n\n\n\n\n\n\nNoteSupplementary material: LMM as a LGM\n\n\n\nIn matrix form, the linear mixed model for the j-th group can be written as:\n\\[ \\overbrace{\\mathbf{y}_j}^{ N \\times 1} = \\overbrace{X_j}^{ N \\times 2} \\underbrace{\\beta}_{1\\times 1} + \\overbrace{Z_j}^{n_j \\times 1} \\underbrace{u_j}_{1\\times1} + \\overbrace{\\epsilon_j}^{n_j \\times 1}, \\]\nIn a latent Gaussian model (LGM) formulation the mixed model predictor for the i-th observation can be written as :\n\\[\n\\eta_i = \\beta_0 + \\beta_1 x_i + \\sum_k^K f_k(u_j)\n\\]\nwhere \\(f_k(u_j) = u_j\\) since there’s only one random effect per group (i.e., a random intercept for group \\(j\\)). The fixed effects \\((\\beta_0,\\beta_1)\\) are assigned Gaussian priors (e.g., \\(\\beta \\sim \\mathcal{N}(0,\\tau_\\beta^{-1})\\)). The random effects \\(\\mathbf{u} = (u_1,\\ldots,u_m)^T\\) follow a Gaussian density \\(\\mathcal{N}(0,\\mathbf{Q}_u^{-1})\\) where \\(\\mathbf{Q}_u = \\tau_u\\mathbf{I}_m\\) is the precision matrix for the random intercepts. Then, the components for the LGM are the following:\n\nLatent field given by\n\\[\n\\begin{bmatrix} \\beta \\\\\\mathbf{u}\n\\end{bmatrix} \\sim \\mathcal{N}\\left(\\mathbf{0},\\begin{bmatrix}\\tau_\\beta^{-1}\\mathbf{I}_2&\\mathbf{0}\\\\\\mathbf{0} &\\tau_u^{-1}\\mathbf{I}_m\\end{bmatrix}\\right)\n\\]\nLikelihood:\n\\[\ny_i \\sim \\mathcal{N}(\\eta_i,\\tau_{\\epsilon}^{-1})\n\\]\nHyperparameters:\n\n\\(\\tau_u\\sim\\mathrm{Gamma}(a,b)\\)\n\\(\\tau_\\epsilon \\sim \\mathrm{Gamma}(c,d)\\)\n\n\n\n\n\nSimulate example data\n\n#|\nset.seed(12)\nbeta = c(1.5,1)\nsd_error = 1\ntau_group = 1\n\nn = 100\nn.groups = 5\nx = rnorm(n)\nv = rnorm(n.groups, sd = tau_group^{-1/2})\ny = beta[1] + beta[2] * x + rnorm(n, sd = sd_error) +\n  rep(v, each = 20)\n\ndf = data.frame(y = y, x = x, j = rep(1:5, each = 20))\n\nNote that inlabru expects an integer indexing variable to label the groups.\n\n\nCode\nggplot(df) +\n  geom_point(aes(x = x, colour = factor(j), y = y)) +\n  theme_classic() +\n  scale_colour_discrete(\"Group\")\n\n\n\n\n\nData for the linear mixed model example with 5 groups\n\n\n\n\n\n\nFitting a LMM in inlabru\n\nThis is done in three steps:\n\nDefine the model components\nDefine the formula and the observation model (likelihood) using bru_obs()\nRun the model using bru()\n\nAfter that you can collect and inspect results.\nDefining model components and observational model\nIn order to specify this model we must use the group argument to tell inlabru which variable indexes the groups. The model = \"iid\" tells INLA that the groups are independent from one another.\n\n# Define model components\ncmp =  ~ -1 + beta_0(1) + beta_1(x, model = \"linear\") +\n  u(j, model = \"iid\")\n\nThe group variable is indexed by column j in the dataset. We have chosen to name this component v() to connect with the mathematical notation that we used above.\n\n# Construct likelihood\nlik =  bru_obs(formula = y ~.,\n            family = \"gaussian\",\n            data = df)\n\nFitting the model\nThe model can be fitted exactly as in the previous examples by using the bru function with the components and likelihood objects.\n\nfit = bru(cmp, lik)\nsummary(fit)\n## inlabru version: 2.13.0.9016 \n## INLA version: 25.11.12-1 \n## Components: \n## Latent components:\n## beta_0: main = linear(1)\n## beta_1: main = linear(x)\n## u: main = iid(j)\n## Observation models: \n##   Family: 'gaussian'\n##     Tag: &lt;No tag&gt;\n##     Data class: 'data.frame'\n##     Response class: 'numeric'\n##     Predictor: y ~ .\n##     Additive/Linear: TRUE/TRUE\n##     Used components: effects[beta_0, beta_1, u], latent[] \n## Time used:\n##     Pre = 0.977, Running = 0.197, Post = 0.0335, Total = 1.21 \n## Fixed effects:\n##         mean    sd 0.025quant 0.5quant 0.975quant  mode kld\n## beta_0 2.108 0.438      1.229    2.108      2.986 2.108   0\n## beta_1 1.172 0.120      0.936    1.172      1.407 1.172   0\n## \n## Random effects:\n##   Name     Model\n##     u IID model\n## \n## Model hyperparameters:\n##                                          mean    sd 0.025quant 0.5quant\n## Precision for the Gaussian observations 0.995 0.144      0.738    0.986\n## Precision for u                         1.613 1.060      0.369    1.356\n##                                         0.975quant  mode\n## Precision for the Gaussian observations       1.30 0.971\n## Precision for u                               4.35 0.918\n## \n## Marginal log-Likelihood:  -179.93 \n##  is computed \n## Posterior summaries for the linear predictor and the fitted values are computed\n## (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')\n\n\n\nModel predictions\nTo compute model predictions we can create a data.frame containing a range of values of covariate where we want the response to be predicted for each group. Then we simply call the predict function while specifying the model components.\n\n\nLMM fitted values\n# New data\nxpred = seq(range(x)[1], range(x)[2], length.out = 100)\nj = 1:n.groups\npred_data = expand.grid(x = xpred, j = j)\npred = predict(fit, pred_data, formula = ~ beta_0 + beta_1 + u)\n\n\npred %&gt;%\n  ggplot(aes(x=x,y=mean,color=factor(j)))+\n  geom_line()+\n  geom_ribbon(aes(x,ymin = q0.025, ymax= q0.975,fill=factor(j)), alpha = 0.5) +\n  geom_point(data=df,aes(x=x,y=y,colour=factor(j)))+\n  facet_wrap(~j)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTip Question\n\n\n\nSuppose that we are also interested in including random slopes into our model. Assuming intercept and slopes are independent, can your write down the linear predictor and the components of this model as a LGM?\n\n\nGive me a hint\n\nIn general, the mixed model predictor can decomposed as:\n\\[ \\pmb{\\eta} = X\\beta + Z\\mathbf{u} \\]\nWhere \\(X\\) is a \\(n \\times p\\) design matrix and \\(\\beta\\) the corresponding p-dimensional vector of fixed effects. Then \\(Z\\) is a \\(n\\times q_J\\) design matrix for the \\(q_J\\) random effects and \\(J\\) groups; \\(\\mathbf{v}\\) is then a \\(q_J \\times 1\\) vector of \\(q\\) random effects for the \\(J\\) groups. In a latent Gaussian model (LGM) formulation this can be written as:\n\\[ \\eta_i = \\beta_0 + \\sum\\beta_j x_{ij} + \\sum_k f(k) (u_{ij}) \\]\n\n\n\nSee Solution\n\n\nThe linear predictor is given by\n\\[\n\\eta_i = \\beta_0 + \\beta_1x_i + u_{0j} + u_{1j}x_i\n\\]\nLatent field defined by:\n\n\\(\\beta \\sim \\mathcal{N}(0,\\tau_\\beta^{-1})\\)\n\\(\\mathbf{u}_j = \\begin{bmatrix}u_{0j} \\\\ u_{1j}\\end{bmatrix}, \\mathbf{u}_j \\sim \\mathcal{N}(\\mathbf{0},\\mathbf{Q}_u^{-1})\\) where the precision matrix is a block-diagonal matrix with entries \\(\\mathbf{Q}_u= \\begin{bmatrix}\\tau_{u_0} & {0} \\\\{0} & \\tau_{u_1}\\end{bmatrix}\\)\n\nThe hyperparameters are then:\n\n\\(\\tau_{u_0},\\tau_{u_1} \\text{and}~\\tau_\\epsilon\\)\n\n\nTo fit this model in inlabru we can simply modify the model components as follows:\n\ncmp =  ~ -1 + beta_0(1) + beta_1(x, model = \"linear\") +\n  u0(j, model = \"iid\") + u1(j,x, model = \"iid\")"
   },
   {
-    "objectID": "Install_software.html",
-    "href": "Install_software.html",
-    "title": "Software Installation",
-    "section": "",
-    "text": "Please use the instructions below to install and check your installation.\nIf you run into issues, you can post a question with information about what you tried and what didn’t work, on the course github discussion page and we will try reply.\nSince 29 April 2025, the latest INLA package is built for R 4.5, so if you’re able to upgrade your R installation, please do so to avoid unnecessary issues. The package will in many cases also work with older R versions, but compatibility is sometimes difficult."
-  },
-  {
-    "objectID": "Install_software.html#installing-inla-and-inlabru",
-    "href": "Install_software.html#installing-inla-and-inlabru",
-    "title": "Software Installation",
-    "section": "Installing INLA and inlabru",
-    "text": "Installing INLA and inlabru\nDue to the work involved in building the binaries for the INLA package C software for different architectures, the INLA package is not on CRAN, but it can be installed from its own distribution repository.\n\nCheck your R version.\nInstall R-INLA, instructions can be found here\nInstall inlabru (available from CRAN)\n\n\n# Enable universe(s) by inlabru-org\noptions(repos = c(\n  inlabruorg = \"https://inlabru-org.r-universe.dev\",\n  INLA = \"https://inla.r-inla-download.org/R/testing\",\n  CRAN = \"https://cloud.r-project.org\"\n))\n\n# Install some packages\ninstall.packages(\"inlabru\")\n\n\nMake sure you have the latest R-INLA, inlabru and R versions installed.\nInstall the following libraries:\n\n\n\ninstall.packages(c(\n  \"dplyr\",\n  \"ggplot2\",\n  \"patchwork\",\n  \"scico\"\n))"
-  },
-  {
-    "objectID": "Install_software.html#installation-check",
-    "href": "Install_software.html#installation-check",
-    "title": "Software Installation",
-    "section": "Installation check",
-    "text": "Installation check\nPlease check your installation using the basic model runs below.\nIf you run into issues, you can post a question with information about what you tried and what didn’t work, on the course github discussion page.\nYou can check that INLA is correctly installed by running\n\ndf &lt;- data.frame(y = rnorm(100) + 10)\nfit &lt;- INLA::inla(\n  y ~ 1,\n  data = df\n)\nsummary(fit)\n\nTime used:\n    Pre = 0.953, Running = 0.304, Post = 0.00882, Total = 1.27 \nFixed effects:\n             mean    sd 0.025quant 0.5quant 0.975quant  mode kld\n(Intercept) 9.918 0.095      9.731    9.918     10.106 9.918   0\n\nModel hyperparameters:\n                                        mean    sd 0.025quant 0.5quant\nPrecision for the Gaussian observations 1.11 0.157      0.829     1.11\n                                        0.975quant mode\nPrecision for the Gaussian observations       1.44 1.09\n\nMarginal log-Likelihood:  -149.22 \n is computed \nPosterior summaries for the linear predictor and the fitted values are computed\n(Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')\n\n\nIf the simple inla() call fails with a crash, you may need to install different inla binaries for your hardware/software combination, with INLA::inla.binary.install().\nWhen inla() works, you can check that inlabru is installed correctly by running the same model in inlabru:\n\nfit &lt;- inlabru::bru(\n  y ~ Intercept(1, prec.linear = exp(-7)),\n  data = df\n)\nsummary(fit)\n\ninlabru version: 2.13.0.9016 \nINLA version: 25.11.12-1 \nComponents: \nLatent components:\nIntercept: main = linear(1)\nObservation models: \n  Family: 'gaussian'\n    Tag: &lt;No tag&gt;\n    Data class: 'data.frame'\n    Response class: 'numeric'\n    Predictor: y ~ .\n    Additive/Linear: TRUE/TRUE\n    Used components: effects[Intercept], latent[] \nTime used:\n    Pre = 0.878, Running = 0.193, Post = 0.0142, Total = 1.08 \nFixed effects:\n           mean    sd 0.025quant 0.5quant 0.975quant  mode kld\nIntercept 9.918 0.095      9.731    9.918     10.106 9.918   0\n\nModel hyperparameters:\n                                        mean    sd 0.025quant 0.5quant\nPrecision for the Gaussian observations 1.11 0.157      0.829     1.11\n                                        0.975quant mode\nPrecision for the Gaussian observations       1.44 1.09\n\nMarginal log-Likelihood:  -153.68 \n is computed \nPosterior summaries for the linear predictor and the fitted values are computed\n(Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "inlabru Workshop",
-    "section": "",
-    "text": "Welcome to the course!\n\nWelcome to the inlabru workshop!\nThe aim of this workshop is to introduce you to a range of statistical modelling approaches, in particular the temporal, spatial and spatio-temporal modelling as implemented in the inlabru package.\nWorkshop materials are available in the github repository\n⚠️Important! ⚠️ Please use the instructions provided here to install and check your installation before the course start.\n\n\n\nLearning Objectives for the workshop\nAt the end of the workshop, participants will have an understanding of:\n\nthe motivation for and the challenges of analysing and modelling spatial data\nstatistical models used to analyse spatial and spatio-temporal data\nthe implementation of these models in the inlabru package\nhow to independently analyse spatial data with inlabru\n\n\n\nIntended audience\nThe workshop aims to cater for participants with a range of different backgrounds, who is interested in analysing data with modern spatial and spatio-temporal statistical modelling approaches.\n\n\nPrerequisites\nParticipants should be familiar with the R environment, and general statistical approaches for modelling such as regression, analysis of (co)variance, and generalized linear models.​\nNo knowledge of R-INLA or inlabru is required.\n\n\nSchedule\n\nDay 1Day 2Day 3Day 4Day 5\n\n\n: {.striped .hover}\n\n\n: {.striped .hover}\n\n\n: {.striped .hover}\n\n\n: {.striped .hover}\n\n\n: {.striped .hover}"
-  },
-  {
     "objectID": "slides/slides_1.html#outline",
     "href": "slides/slides_1.html#outline",
     "title": "Lecture 1",
@@ -509,5 +481,467 @@
     "title": "Lecture 1",
     "section": "Take home message!",
     "text": "Take home message!\n\nMany of the models you have used (and some you have never used but will learn about) are just special cases of the large class of Latent Gaussian models\ninlabru provides an efficient and unified way to fit all these models!"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "inlabru Workshop",
+    "section": "",
+    "text": "Welcome to the course!\n\nWelcome to the inlabru workshop!\nThe aim of this workshop is to introduce you to a range of statistical modelling approaches, in particular the temporal, spatial and spatio-temporal modelling as implemented in the inlabru package.\nWorkshop materials are available in the github repository\n⚠️Important! ⚠️ Please use the instructions provided here to install and check your installation before the course start.\n\n\n\nLearning Objectives for the workshop\nAt the end of the workshop, participants will have an understanding of:\n\nthe motivation for and the challenges of analysing and modelling spatial data\nstatistical models used to analyse spatial and spatio-temporal data\nthe implementation of these models in the inlabru package\nhow to independently analyse spatial data with inlabru\n\n\n\nIntended audience\nThe workshop aims to cater for participants with a range of different backgrounds, who is interested in analysing data with modern spatial and spatio-temporal statistical modelling approaches.\n\n\nPrerequisites\nParticipants should be familiar with the R environment, and general statistical approaches for modelling such as regression, analysis of (co)variance, and generalized linear models.​\nNo knowledge of R-INLA or inlabru is required.\n\n\nSchedule\n\nDay 1Day 2Day 3Day 4Day 5\n\n\n: {.striped .hover}\n\n\n: {.striped .hover}\n\n\n: {.striped .hover}\n\n\n: {.striped .hover}\n\n\n: {.striped .hover}"
+  },
+  {
+    "objectID": "Install_software.html",
+    "href": "Install_software.html",
+    "title": "Software Installation",
+    "section": "",
+    "text": "Please use the instructions below to install and check your installation.\nIf you run into issues, you can post a question with information about what you tried and what didn’t work, on the course github discussion page and we will try reply.\nSince 29 April 2025, the latest INLA package is built for R 4.5, so if you’re able to upgrade your R installation, please do so to avoid unnecessary issues. The package will in many cases also work with older R versions, but compatibility is sometimes difficult."
+  },
+  {
+    "objectID": "Install_software.html#installing-inla-and-inlabru",
+    "href": "Install_software.html#installing-inla-and-inlabru",
+    "title": "Software Installation",
+    "section": "Installing INLA and inlabru",
+    "text": "Installing INLA and inlabru\nDue to the work involved in building the binaries for the INLA package C software for different architectures, the INLA package is not on CRAN, but it can be installed from its own distribution repository.\n\nCheck your R version.\nInstall R-INLA, instructions can be found here\nInstall inlabru (available from CRAN)\n\n\n# Enable universe(s) by inlabru-org\noptions(repos = c(\n  inlabruorg = \"https://inlabru-org.r-universe.dev\",\n  INLA = \"https://inla.r-inla-download.org/R/testing\",\n  CRAN = \"https://cloud.r-project.org\"\n))\n\n# Install some packages\ninstall.packages(\"inlabru\")\n\n\nMake sure you have the latest R-INLA, inlabru and R versions installed.\nInstall the following libraries:\n\n\n\ninstall.packages(c(\n  \"dplyr\",\n  \"ggplot2\",\n  \"patchwork\",\n  \"scico\"\n))"
+  },
+  {
+    "objectID": "Install_software.html#installation-check",
+    "href": "Install_software.html#installation-check",
+    "title": "Software Installation",
+    "section": "Installation check",
+    "text": "Installation check\nPlease check your installation using the basic model runs below.\nIf you run into issues, you can post a question with information about what you tried and what didn’t work, on the course github discussion page.\nYou can check that INLA is correctly installed by running\n\ndf &lt;- data.frame(y = rnorm(100) + 10)\nfit &lt;- INLA::inla(\n  y ~ 1,\n  data = df\n)\nsummary(fit)\n\nTime used:\n    Pre = 0.953, Running = 0.304, Post = 0.00882, Total = 1.27 \nFixed effects:\n             mean    sd 0.025quant 0.5quant 0.975quant  mode kld\n(Intercept) 9.918 0.095      9.731    9.918     10.106 9.918   0\n\nModel hyperparameters:\n                                        mean    sd 0.025quant 0.5quant\nPrecision for the Gaussian observations 1.11 0.157      0.829     1.11\n                                        0.975quant mode\nPrecision for the Gaussian observations       1.44 1.09\n\nMarginal log-Likelihood:  -149.22 \n is computed \nPosterior summaries for the linear predictor and the fitted values are computed\n(Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')\n\n\nIf the simple inla() call fails with a crash, you may need to install different inla binaries for your hardware/software combination, with INLA::inla.binary.install().\nWhen inla() works, you can check that inlabru is installed correctly by running the same model in inlabru:\n\nfit &lt;- inlabru::bru(\n  y ~ Intercept(1, prec.linear = exp(-7)),\n  data = df\n)\nsummary(fit)\n\ninlabru version: 2.13.0.9016 \nINLA version: 25.11.12-1 \nComponents: \nLatent components:\nIntercept: main = linear(1)\nObservation models: \n  Family: 'gaussian'\n    Tag: &lt;No tag&gt;\n    Data class: 'data.frame'\n    Response class: 'numeric'\n    Predictor: y ~ .\n    Additive/Linear: TRUE/TRUE\n    Used components: effects[Intercept], latent[] \nTime used:\n    Pre = 0.878, Running = 0.193, Post = 0.0142, Total = 1.08 \nFixed effects:\n           mean    sd 0.025quant 0.5quant 0.975quant  mode kld\nIntercept 9.918 0.095      9.731    9.918     10.106 9.918   0\n\nModel hyperparameters:\n                                        mean    sd 0.025quant 0.5quant\nPrecision for the Gaussian observations 1.11 0.157      0.829     1.11\n                                        0.975quant mode\nPrecision for the Gaussian observations       1.44 1.09\n\nMarginal log-Likelihood:  -153.68 \n is computed \nPosterior summaries for the linear predictor and the fitted values are computed\n(Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')"
+  },
+  {
+    "objectID": "slides/slides_2.html#main-elements-of-the-inla-methodology",
+    "href": "slides/slides_2.html#main-elements-of-the-inla-methodology",
+    "title": "Lecture 2",
+    "section": "Main elements of the INLA methodology",
+    "text": "Main elements of the INLA methodology\n\nLatent Gaussian Models\nSparse matrices\nLaplace approximations\n…other “technical” details for the special interested!"
+  },
+  {
+    "objectID": "slides/slides_2.html#repetition",
+    "href": "slides/slides_2.html#repetition",
+    "title": "Lecture 2",
+    "section": "Repetition",
+    "text": "Repetition\nEverything in INLA is based on so-called latent Gaussian models\n\n\n\nA few hyperparameters \\(\\theta\\sim\\pi(\\theta)\\) control variances, range and so on\nGiven these hyperparameters we have an underlying Gaussian distribution \\(\\mathbf{u}|\\theta\\sim\\mathcal{N}(\\mathbf{0},\\mathbf{Q}^{-1}(\\theta))\\) that we cannot directly observe\nInstead we make indirect observations \\(\\mathbf{y}|\\mathbf{u},\\theta\\sim\\pi(\\mathbf{y}|\\mathbf{u},\\theta)\\) of the underlying latent Gaussian field"
+  },
+  {
+    "objectID": "slides/slides_2.html#repetition-1",
+    "href": "slides/slides_2.html#repetition-1",
+    "title": "Lecture 2",
+    "section": "Repetition",
+    "text": "Repetition\nModels of this kind: \\[\n\\begin{aligned}\n\\mathbf{y}|\\mathbf{u},\\theta &\\sim \\prod_i \\pi(y_i|\\eta_i,\\theta)\\\\\n\\mathbf{\\eta} & = A_1\\mathbf{u}_1 + A_2\\mathbf{u}_2+\\dots + A_k\\mathbf{u}_k\\\\\n\\mathbf{u},\\theta &\\sim \\mathcal{N}(0,\\mathbf{Q}(θ)^{−1})\\\\\n\\theta & \\sim \\pi(\\theta)\n\\end{aligned}\n\\]\noccurs in many, seemingly unrelated, statistical models."
+  },
+  {
+    "objectID": "slides/slides_2.html#examples",
+    "href": "slides/slides_2.html#examples",
+    "title": "Lecture 2",
+    "section": "Examples",
+    "text": "Examples\n\nGeneralised linear (mixed) models\nStochastic volatility\nGeneralised additive (mixed) models\nMeasurement error models\nSpline smoothing\nSemiparametric regression\nSpace-varying (semiparametric) regression models\nDisease mapping\nLog-Gaussian Cox-processes\nModel-based geostatistics (*)\nSpatio-temporal models\nSurvival analysis\n+++"
+  },
+  {
+    "objectID": "slides/slides_2.html#main-characteristics",
+    "href": "slides/slides_2.html#main-characteristics",
+    "title": "Lecture 2",
+    "section": "Main Characteristics",
+    "text": "Main Characteristics\n\nLatent Gaussian model \\(\\mathbf{u}|\\theta\\sim\\mathcal{N}(0,\\mathbf{Q}^{-1}(\\theta))\\)\nThe data are conditionally independent given the latent field\nThe predictor is linear wrt the elements of \\(\\mathbf{u}\\)1\nThe dimension of \\(\\mathbf{u}\\) can be big (\\(10^3-10^6\\))\nThe dimension of \\(\\theta\\) should be not too big.\n\n\n\nIn this talk we will focus on the characteristics of \\(\\mathbf{u}|\\theta\\)\n\n\nwe will see that this can be partly relaxed 😃"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-big-n-problem",
+    "href": "slides/slides_2.html#the-big-n-problem",
+    "title": "Lecture 2",
+    "section": "The big n problem!",
+    "text": "The big n problem!\nFor many interesting applications it is necessary to solve large problems.\n\n\n\nWith large problems we think of models where the size \\(n\\) of the latent field \\(\\mathbf{u}\\) is between 100 to 100, 000. This includes fixed effects, spatial effects and so on.\n\n\n\n\n\n\nComputations with models of this size are cumbersome!\n\n\n\n\n\n\nThe solution in the INLA world are Gaussian Markov random fields (GMRFs)!"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-gaussian-distribution",
+    "href": "slides/slides_2.html#the-gaussian-distribution",
+    "title": "Lecture 2",
+    "section": "The Gaussian distribution",
+    "text": "The Gaussian distribution\nA Gaussian distribution \\(\\mathbf{u}\\sim\\mathcal{N}(0,\\Sigma)\\) is controlled by:\n— The mean vector \\(\\mu\\), which we have set equal to 0. This is the centre of the distribution\n— The matrix \\(\\Sigma\\) describes all pairwise covariances \\(\\Sigma_{ij} = \\text{Cov}(u_i, u_j)\\)\nFormally \\[\n\\pi(\\mathbf{u}) = \\frac{1}{2\\pi|\\Sigma|^{1/2}}\\exp\\left\\{-\\frac{1}{2}\\mathbf{u}^T\\Sigma^{-1}\\mathbf{u}\\right\\}\n\\]"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-gaussian-distribution-1",
+    "href": "slides/slides_2.html#the-gaussian-distribution-1",
+    "title": "Lecture 2",
+    "section": "The Gaussian distribution",
+    "text": "The Gaussian distribution\n\n\n\n\n\n\n\nAdvantages 😄👍\nDisadvantages 😔👎\n\n\n\n\nmostly theoretical\nmostly computational\n\n\nAnalytically tractable.\n\\(\\Sigma\\) usually is large and dense\n\n\nWe have a good understanding of its properties.\nComputations scale as \\(\\mathcal{O}(n^3)\\)\n\n\nBasically, it’s easy to do the theory\nNot feasible for large problems\n\n\n\n\nWe need to reduce the computational burden !"
+  },
+  {
+    "objectID": "slides/slides_2.html#sparse-matrices",
+    "href": "slides/slides_2.html#sparse-matrices",
+    "title": "Lecture 2",
+    "section": "Sparse matrices",
+    "text": "Sparse matrices\n\nA matrix \\(\\mathbf{Q}\\) is called sparse if most of its elements are zero.\n\n\\[\n\\mathbf{Q} = \\begin{bmatrix}\n1 & 0 & 0 & 0\\\\\n0& 2& 0 & 0\\\\\n0& 0& -1 & 0\\\\\n0& 1& 0 & 0.4\\\\\n\\end{bmatrix}\n\\]\n— There exist very efficient numerical algorithms to deal with sparse matrices:\n— In order to solve large problems we need to exploit some property to make the computations feasible\n\n\nWhich matrix should be sparse in a Gaussian field?"
+  },
+  {
+    "objectID": "slides/slides_2.html#two-possible-options",
+    "href": "slides/slides_2.html#two-possible-options",
+    "title": "Lecture 2",
+    "section": "Two possible options",
+    "text": "Two possible options\n\\[\n\\mathcal{u}\\sim\\mathcal{N}(0,\\Sigma)\n\\]\n\nForce the covariance matrix \\(\\Sigma\\) to be sparse\nForce the precision matrix \\(\\Sigma^{-1}\\) to be sparse"
+  },
+  {
+    "objectID": "slides/slides_2.html#two-possible-options-1",
+    "href": "slides/slides_2.html#two-possible-options-1",
+    "title": "Lecture 2",
+    "section": "Two possible options",
+    "text": "Two possible options\n\\[\n\\mathcal{u}\\sim\\mathcal{N}(0,\\Sigma)\n\\]\n\nForce the covariance matrix \\(\\Sigma\\) to be sparse\n\n\\(\\Sigma_{ij} = \\text{Cov}(u_i, u_j)\\) : Covariance between \\(u_i\\) and \\(u_j\\)\n\\(\\Sigma_{ij} = 0\\) \\(\\longrightarrow\\) \\(u_i\\) and \\(u_j\\) are independent\nA sparse covariance matrix implies that many elements of \\(\\mathbf{u}\\) are mutually independent…..is this desirable?\n\nForce the precision matrix \\(\\mathbf{Q} = \\Sigma^{-1}\\) to be sparse"
+  },
+  {
+    "objectID": "slides/slides_2.html#two-possible-options-2",
+    "href": "slides/slides_2.html#two-possible-options-2",
+    "title": "Lecture 2",
+    "section": "Two possible options",
+    "text": "Two possible options\n\\[\n\\mathcal{u}\\sim\\mathcal{N}(0,\\Sigma)\n\\]\n\nForce the covariance matrix \\(\\Sigma\\) to be sparse\n\n\\(\\Sigma_{ij} = \\text{Cov}(u_i, u_j)\\) : Covariance between \\(u_i\\) and \\(u_j\\)\n\\(\\Sigma_{ij} = 0\\) \\(\\longrightarrow\\) \\(u_i\\) and \\(u_j\\) are independent\nA sparse covariance matrix implies that many elements of \\(\\mathbf{u}\\) are mutually independent…..is this desirable?\n\nForce the precision matrix \\(\\mathbf{Q} = \\Sigma^{-1}\\) to be sparse\n\nWhat does \\(Q_{ij}\\) represents?\nWhat does a sparse precision matrix implies?"
+  },
+  {
+    "objectID": "slides/slides_2.html#example-the-ar1-proces",
+    "href": "slides/slides_2.html#example-the-ar1-proces",
+    "title": "Lecture 2",
+    "section": "Example: The AR1 proces",
+    "text": "Example: The AR1 proces\nDefinition\n\\[\n\\begin{aligned}\n\\mathbf{i=1}&:  u_1 \\sim\\mathcal{N}(0, \\frac{1}{1-\\phi^2})\\\\\n\\mathbf{i=2,\\dots,T}&:  u_i  = \\phi\\  u_{i-1} +\\epsilon_i,\\ \\epsilon_i\\sim\\mathcal{N}(0,1)\n\\end{aligned}\n\\]\n\nVery common to model dependence in time\nThe joint distribution of \\(u_1,u_2,\\dots,u_N\\) is Gaussian\nHow do covariance and precision matrices look?"
+  },
+  {
+    "objectID": "slides/slides_2.html#covariance-and-precision-matrix-for-ar1",
+    "href": "slides/slides_2.html#covariance-and-precision-matrix-for-ar1",
+    "title": "Lecture 2",
+    "section": "Covariance and Precision Matrix for AR1",
+    "text": "Covariance and Precision Matrix for AR1\n\n\nCovariance Matrix\n\\[\n\\Sigma = \\frac{1}{1-\\phi^2}  \\begin{bmatrix}\n1& \\phi & \\phi^2  & \\dots& \\phi^N \\\\\n\\phi & 1& \\phi  & \\dots& \\phi^{N-1} \\\\\n\\phi^2 & \\phi & 1 & \\dots& \\phi^{N-2} \\\\\n\\dots& \\dots& \\dots& \\dots& \\dots& \\\\\n\\phi^{N} & \\phi^{N-1}& \\phi^{N-2}  & \\dots& 1\\\\\n\\end{bmatrix}\n\\]\n\nThis is a dense matrix.\nAll elements of the \\(\\mathbf{u}\\) vector are dependent."
+  },
+  {
+    "objectID": "slides/slides_2.html#covariance-and-precision-matrix-for-ar1-1",
+    "href": "slides/slides_2.html#covariance-and-precision-matrix-for-ar1-1",
+    "title": "Lecture 2",
+    "section": "Covariance and Precision Matrix for AR1",
+    "text": "Covariance and Precision Matrix for AR1\nPrecision Matrix\n\\[\n\\mathbf{Q} = \\Sigma^{-1} =  \\begin{bmatrix}\n1& -\\phi & 0  & 0 &\\dots& 0 \\\\\n-\\phi & 1 + \\phi^2& -\\phi  & 0 & \\dots& 0 \\\\\n0 & -\\phi & 1-\\phi^2 &-\\phi &  \\dots& 0 \\\\\n0 & 0 & -\\phi &1-\\phi^2 & \\dots & \\dots \\\\\n\\dots& \\dots& \\dots& \\dots& \\dots& \\dots& \\\\\n0 &0 & 0 & \\dots  & -\\phi& 1\\\\\n\\end{bmatrix}\n\\]\n\nThis is a tridiagonal matrix, it is sparse\nThe tridiagonal form of \\(\\mathbf{Q}\\) can be exploited for quick calculations.\n\n\nWhat is the key property of this example that causes \\(\\mathbf{Q}\\) to be sparse?"
+  },
+  {
+    "objectID": "slides/slides_2.html#conditional-independence",
+    "href": "slides/slides_2.html#conditional-independence",
+    "title": "Lecture 2",
+    "section": "Conditional independence",
+    "text": "Conditional independence\nThe key lies in the full conditionals\n\\[\nu_t|\\mathbf{u}_{-t}\\sim\\mathcal{N}\\left(\\frac{\\phi}{1-\\phi^2}(x_{t-1}+x_{t+1}), \\frac{1}{1+\\phi^2}\\right)\n\\]\n\nEach timepoint is only conditionally dependent on the two closest timepoints\nIt is useful to represent the conditional independence structure through a graph"
+  },
+  {
+    "objectID": "slides/slides_2.html#conditional-independence-and-the-precision-matrix",
+    "href": "slides/slides_2.html#conditional-independence-and-the-precision-matrix",
+    "title": "Lecture 2",
+    "section": "Conditional independence and the precision matrix",
+    "text": "Conditional independence and the precision matrix\n\n\nTheorem: \\(u_i\\perp u_j|\\mathbf{u}_{-ij}\\Longleftrightarrow Q{ij} =0\\)\n\n\nThis is the key property! 😃"
+  },
+  {
+    "objectID": "slides/slides_2.html#informal-definition-of-a-gmrf",
+    "href": "slides/slides_2.html#informal-definition-of-a-gmrf",
+    "title": "Lecture 2",
+    "section": "(Informal) definition of a GMRF",
+    "text": "(Informal) definition of a GMRF\n\n\nA GMRF is a Gaussian distribution where the non-zero elements of the precision matrix are defined by the graph structure.\n\n\n\nIn the previous example the precision matrix is tridiagonal since each variable is connected only to its predecessor and successor.\n\\[\n\\mathbf{Q} = \\Sigma^{-1} =  \\begin{bmatrix}\n1& -\\phi & 0  & 0 &\\dots& 0 \\\\\n-\\phi & 1 + \\phi^2& -\\phi  & 0 & \\dots& 0 \\\\\n0 & -\\phi & 1-\\phi^2 &-\\phi &  \\dots& 0 \\\\\n0 & 0 & -\\phi &1-\\phi^2 & \\dots & \\dots \\\\\n\\dots& \\dots& \\dots& \\dots& \\dots& \\dots& \\\\\n0 &0 & 0 & \\dots  & -\\phi& 1\\\\\n\\end{bmatrix}\n\\]"
+  },
+  {
+    "objectID": "slides/slides_2.html#gmrf-and-inla",
+    "href": "slides/slides_2.html#gmrf-and-inla",
+    "title": "Lecture 2",
+    "section": "GMRF and INLA",
+    "text": "GMRF and INLA\n\nEvery component of the latent Gaussian field \\(\\mathbf{u}\\) in an INLA model is always a GMRF!!\nWe will see how the idea of GMRF expands also for continuously indexed processes (SPDE approach)"
+  },
+  {
+    "objectID": "slides/slides_2.html#what-do-we-need-to-be-able-to-compute",
+    "href": "slides/slides_2.html#what-do-we-need-to-be-able-to-compute",
+    "title": "Lecture 2",
+    "section": "What do we need to be able to compute?",
+    "text": "What do we need to be able to compute?\n\nWe need to compute determinants of large, sparse matrices. This is needed for likelihood calculations.\nWe need to compute square roots of large, sparse matrices. This is needed for likelihood calculations and simulations.\n\n\nTechnically:\n\nIn the end our computations come down to the Cholesky decomposition, \\(\\mathbf{Q} = \\mathbf{LL}^T\\)\nAfter \\(\\mathbf{L}\\) is available, things are fast\nThe limiting factor is how quickly the Cholesky factorization can be done"
+  },
+  {
+    "objectID": "slides/slides_2.html#what-is-the-gain",
+    "href": "slides/slides_2.html#what-is-the-gain",
+    "title": "Lecture 2",
+    "section": "What is the gain?",
+    "text": "What is the gain?\n\nTemporal structure uses \\(\\mathcal{O}(n)\\) operations\nSpatial structure uses \\(\\mathcal{O}(n^{3/2})\\) operations\nSpatio-temporal structure uses \\(\\mathcal{O}(n^{2})\\) operations\n\nCompare this with \\(\\mathcal{O}(n^{3})\\) operations in the general case."
+  },
+  {
+    "objectID": "slides/slides_2.html#summary",
+    "href": "slides/slides_2.html#summary",
+    "title": "Lecture 2",
+    "section": "Summary",
+    "text": "Summary\nGaussian Markov Random Fields (GMRF):\n\nGive faster computations, both in INLA and in MCMC schemes (thanks to sparse precision matrices)\nKeep the analytical tractability of the Gaussian distribution\nAllow modelling through conditional distributions\nNaturally arises from the SPDE approach (that we will talk about …..)"
+  },
+  {
+    "objectID": "slides/slides_2.html#formal-definition-of-a-gmrf",
+    "href": "slides/slides_2.html#formal-definition-of-a-gmrf",
+    "title": "Lecture 2",
+    "section": "Formal definition of a GMRF",
+    "text": "Formal definition of a GMRF\n\nDefinition\nA random variable \\(\\mathbf{u}\\) is said to be a Gaussian Markov random field (GMRF) with respect to the graph \\(\\mathcal{G}\\), with vertices \\(\\{1, 2,\\dots , n\\}\\) and edges \\(\\mathcal{E}\\), with mean \\(\\mu\\) and precision matrix \\(\\mathbf{Q}\\) if its probability distribution is given by \\[\n\\pi(\\mathbf{u}) = \\frac{|\\mathbf{Q}|^{1/2}}{(2\\pi)^{n/2}}\\exp\\left\\{ -\\frac{1}{2}(\\mathbf{u}-\\mu)^T\\mathbf{Q}(\\mathbf{u}-\\mu)\\right\\}\n\\] and \\(Q_{ij} \\neq 0\\Longleftrightarrow \\{i,j\\}\\in\\mathcal{E}\\)"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-inla-recipe",
+    "href": "slides/slides_2.html#the-inla-recipe",
+    "title": "Lecture 2",
+    "section": "The INLA recipe",
+    "text": "The INLA recipe\n\nNumerical integration schemes\nThe GMRF-Approximation\nThe Laplace approximation\n…many many many “technical” details"
+  },
+  {
+    "objectID": "slides/slides_2.html#hierarchical-gmrf",
+    "href": "slides/slides_2.html#hierarchical-gmrf",
+    "title": "Lecture 2",
+    "section": "Hierarchical GMRF",
+    "text": "Hierarchical GMRF\n\n\\(\\mathbf{y}|\\mathbf{u},\\theta\\), Observation model (likelihood)\n\\(\\mathbf{u}|\\theta\\), Gaussian random field\n\\(\\theta\\) Hyperparameters"
+  },
+  {
+    "objectID": "slides/slides_2.html#hierarchical-gmrf-1",
+    "href": "slides/slides_2.html#hierarchical-gmrf-1",
+    "title": "Lecture 2",
+    "section": "Hierarchical GMRF",
+    "text": "Hierarchical GMRF\n\n\\(\\mathbf{y}|\\mathbf{u},\\theta\\), Observation model (likelihood)\n\\(\\mathbf{u}|\\theta\\), Gaussian random field\n\\(\\theta\\) Hyperparameters\n\nExtra requirements\n\nThe latent field \\(\\mathbf{u}\\) is a GMRF \\[\n\\pi(\\mathbf{u}|\\theta)\\propto\\exp\\left\\{-\\frac{1}{2}\\mathbf{u}^T\\mathbf{Q}\\mathbf{u}\\right\\}\n\\]\n\nThe precision matrix \\(\\mathbf{Q}\\) is sparse."
+  },
+  {
+    "objectID": "slides/slides_2.html#hierarchical-gmrf-2",
+    "href": "slides/slides_2.html#hierarchical-gmrf-2",
+    "title": "Lecture 2",
+    "section": "Hierarchical GMRF",
+    "text": "Hierarchical GMRF\n\n\\(\\mathbf{y}|\\mathbf{u},\\theta\\), Observation model (likelihood)\n\\(\\mathbf{u}|\\theta\\), Gaussian random field\n\\(\\theta\\) Hyperparameters\n\nExtra requirements\n\nThe latent field \\(x\\) is a GMRF \\(\\pi(\\mathbf{u}|\\theta)\\propto\\exp\\left\\{-\\frac{1}{2}\\mathbf{u}^T\\mathbf{Q}\\mathbf{u}\\right\\}\\)\nWe can factorize the likelihood as: \\(\\pi(\\mathbf{y}|\\mathbf{u},\\theta) = \\prod_i\\pi(y_i|\\eta_i,\\theta)\\)\n\nData are conditional independent give \\(\\mathbf{u}\\) and \\(\\theta\\)\nEach data point depends on only 1 element of the latent field: the predictor \\(\\eta_i\\)\n\\(\\eta\\) is a linear combination of other elements of \\(\\mathbf{u}\\): \\(\\eta = \\mathbf{A}^T\\mathbf{u}\\)"
+  },
+  {
+    "objectID": "slides/slides_2.html#hierarchical-gmrf-3",
+    "href": "slides/slides_2.html#hierarchical-gmrf-3",
+    "title": "Lecture 2",
+    "section": "Hierarchical GMRF",
+    "text": "Hierarchical GMRF\n\n\\(\\mathbf{y}|\\mathbf{u},\\theta\\), Observation model (likelihood)\n\\(\\mathbf{u}|\\theta\\), Gaussian random field\n\\(\\theta\\) Hyperparameters\n\nExtra requirements\n\nThe latent field \\(\\mathbf{u}\\) is a GMRF \\(\\pi(\\mathbf{u}|\\theta)\\propto\\exp\\left\\{-\\frac{1}{2}\\mathbf{u}^T\\mathbf{Q}\\mathbf{u}\\right\\}\\)\nWe can factorize the likelihood as: \\(\\pi(\\mathbf{y}|\\mathbf{u},\\theta) = \\prod_i\\pi(y_i|\\eta_i,\\theta)\\)\nThe vector of hyperparameters \\(\\theta\\) is low dimensional."
+  },
+  {
+    "objectID": "slides/slides_2.html#inference",
+    "href": "slides/slides_2.html#inference",
+    "title": "Lecture 2",
+    "section": "Inference",
+    "text": "Inference\nMain Inferential Goal:\n\\[\\begin{aligned}\n\\overbrace{\\pi(\\mathbf{u}, {\\theta}\\mid\\mathbf{y})}^{{\\text{Posterior}}} &\\propto \\overbrace{\\pi({\\theta}) \\pi(\\mathbf{u}\\mid{\\theta})}^{{\\text{Prior}}} \\overbrace{\\prod_{i}\\pi(y_i \\mid \\eta_i, {\\theta})}^{{\\text{Likelihood}}}\n\\end{aligned}\\]\n\nThe posterior distribution is, in general, not available in closed form…\n..what to do then?"
+  },
+  {
+    "objectID": "slides/slides_2.html#inla-strategy-in-short",
+    "href": "slides/slides_2.html#inla-strategy-in-short",
+    "title": "Lecture 2",
+    "section": "INLA strategy in short",
+    "text": "INLA strategy in short\nAssumption\nWe are mainly interested in posterior margianals \\(\\pi(u_i|\\mathbf{y})\\) and \\(\\pi(\\theta_j|\\mathbf{y})\\)\nStrategy\n\nWe use numerical integration in a smart way\nWe approximate what we do not know analitically exploiting the Gaussian structure of \\(\\mathbf{u}|\\theta\\)"
+  },
+  {
+    "objectID": "slides/slides_2.html#numerical-integration",
+    "href": "slides/slides_2.html#numerical-integration",
+    "title": "Lecture 2",
+    "section": "Numerical Integration",
+    "text": "Numerical Integration\nWe want to compute \\(\\pi(u_i|\\mathbf{y})\\)\n\n\n\nHard way 👎\n\\[\n\\pi(u_i|\\mathbf{y}) = \\int\\pi(\\mathbf{u}|\\theta)\\ d\\mathbf{u}_{-i}\n\\]\n\nThis is a hard integral as \\(\\mathbf{u}\\) can be very high dimentional!!"
+  },
+  {
+    "objectID": "slides/slides_2.html#numerical-integration-1",
+    "href": "slides/slides_2.html#numerical-integration-1",
+    "title": "Lecture 2",
+    "section": "Numerical Integration",
+    "text": "Numerical Integration\nWe want to compute \\(\\pi(u_i|\\mathbf{y})\\)\n\n\n\nHard way 👎\n\\[\n\\pi(u_i|\\mathbf{y}) = \\int\\pi(\\mathbf{u}|\\mathbf{y})\\ d\\mathbf{u}_{-i}\n\\]\n\nThis is a hard integral as \\(\\mathbf{u}\\) can be very high dimentional!!\n\n\nEasier way 👍\n\\[\n\\pi(u_i|\\mathbf{y}) = \\int\\pi(u_i|\\theta, \\mathbf{y})\\pi(\\theta|\\mathbf{y)}\\ d\\theta\n\\]\n\n\\(\\theta\\) is a smaller dimensional vector, easier to integrate\nBUT we need to approximate both \\(\\pi(\\theta|\\mathbf{y})\\) and \\(\\pi(u_i|\\theta, \\mathbf{y})\\)"
+  },
+  {
+    "objectID": "slides/slides_2.html#approximating-the-posterior-for-the-hyperparameters",
+    "href": "slides/slides_2.html#approximating-the-posterior-for-the-hyperparameters",
+    "title": "Lecture 2",
+    "section": "Approximating the posterior for the hyperparameters",
+    "text": "Approximating the posterior for the hyperparameters\nWe want to build an approximation to \\(\\pi(\\theta|\\mathbf{y})\\)\n\\[\n\\pi(\\mathbf{\\theta} \\mid \\mathbf{y}) =  \\frac{\n           \\pi(\\mathbf{u}, \\mathbf{\n           \\theta\n}\\mid \\mathbf{y})}\n      {\\pi(\\mathbf{u} \\mid \\mathbf{y},\n            \\mathbf{\\theta})} \\: \\Bigg|_{\\text{This is just the Bayes theorem! It is valid for  any value of } \\mathbf{u}}\n\\]"
+  },
+  {
+    "objectID": "slides/slides_2.html#approximating-the-posterior-for-the-hyperparameters-1",
+    "href": "slides/slides_2.html#approximating-the-posterior-for-the-hyperparameters-1",
+    "title": "Lecture 2",
+    "section": "Approximating the posterior for the hyperparameters",
+    "text": "Approximating the posterior for the hyperparameters\nWe want to build an approximation to \\(\\pi(\\theta|\\mathbf{y})\\)\n\\[\\begin{aligned}\n\\pi(\\mathbf{\\theta} \\mid \\mathbf{y}) & =  \\frac{\n           \\pi(\\mathbf{u}, \\mathbf{\n           \\theta\n}\\mid \\mathbf{y})}\n      {\\pi(\\mathbf{u} \\mid \\mathbf{y},\n            \\mathbf{\\theta})} \\\\\n            & \\propto \\frac{\n            \\overbrace{\\pi( \\mathbf{y}\\mid \\mathbf{u},\\mathbf{\\theta})\\  \\pi(\\mathbf{\\theta})}^{\\text{Non-Gaussian, KNOWN}}  \\overbrace{\\pi( \\mathbf{u}\\mid \\mathbf{\\theta})}^{\\text{ Gaussian, KNOWN}}  }\n            {\\underbrace{\\pi(\\mathbf{u} \\mid \\mathbf{y},\n            \\mathbf{\\theta})}_{\\text{Non-Gaussian,UNKNOWN}}}\n\\end{aligned}\\]\n\n\nWe approximate \\(\\pi(\\mathbf{u} \\mid \\mathbf{y},\\mathbf{\\theta})\\) with a Gaussian distribution \\(\\pi_G(\\mathbf{u} \\mid \\mathbf{y},\\mathbf{\\theta})\\)"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-gmrf-approximation",
+    "href": "slides/slides_2.html#the-gmrf-approximation",
+    "title": "Lecture 2",
+    "section": "The GMRF Approximation",
+    "text": "The GMRF Approximation\n\\[\n\\begin{aligned}\n\\pi(\\mathbf{u}\\mid {\\theta},\\mathbf{y}) & \\propto \\pi(\\mathbf{u}\\mid {\\theta}) \\pi(\\mathbf{y}|\\mathbf{u},\\theta) \\\\\n& \\propto \\exp\\left\\{-\\frac{1}{2}\\mathbf{u}^T\\mathbf{Q}\\mathbf{u} + \\sum \\log \\pi(y_i|\\eta_i,\\theta)\\right\\}\\\\\n\\end{aligned}\n\\]"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-gmrf-approximation-1",
+    "href": "slides/slides_2.html#the-gmrf-approximation-1",
+    "title": "Lecture 2",
+    "section": "The GMRF Approximation",
+    "text": "The GMRF Approximation\n\\[\n\\begin{aligned}\n\\pi(\\mathbf{u}\\mid {\\theta},\\mathbf{y}) & \\propto \\pi(\\mathbf{u}\\mid {\\theta}) \\pi(\\mathbf{y}|\\mathbf{u},\\theta) \\\\\n& \\propto \\exp\\left\\{-\\frac{1}{2}\\mathbf{u}^T\\mathbf{Q}\\mathbf{u} + \\sum \\log \\pi(y_i|\\eta_i,\\theta)\\right\\}\\\\\n\\end{aligned}\n\\]\n\\[\n\\begin{aligned}\n& \\approx \\exp\\left\\{-\\frac{1}{2}\\mathbf{u}^T\\mathbf{Q}\\mathbf{u} + \\sum (b_i\\eta_i - \\frac{1}{2}c_i\\eta_i^2)\\right\\}\n\\end{aligned}\n\\]\nRecall \\[\n\\begin{aligned}\n        f(x) \\approx f(x_0) + f'(x_0)(x-x_0)+ \\frac{1}{2} f''(x_0)(x-x_0)^2\n        = a+ bx - \\frac{1}{2}cx^2\n\\end{aligned}\n\\] with\n\\[\n\\begin{aligned}\nb &=f'(x_0) - f''(x_0)x_0\\\\\nc &= -f''(x_0)\n\\end{aligned}\n\\]."
+  },
+  {
+    "objectID": "slides/slides_2.html#the-gmrf-approximation-2",
+    "href": "slides/slides_2.html#the-gmrf-approximation-2",
+    "title": "Lecture 2",
+    "section": "The GMRF Approximation",
+    "text": "The GMRF Approximation\n\\[\n\\begin{aligned}\n\\pi(\\mathbf{u}\\mid {\\theta},\\mathbf{y}) & \\propto \\pi(\\mathbf{u}\\mid {\\theta}) \\pi(\\mathbf{y}|\\mathbf{u},\\theta) \\\\\n& \\propto \\exp\\left\\{-\\frac{1}{2}\\mathbf{u}^T\\mathbf{Q}\\mathbf{u} + \\sum \\log \\pi(y_i|\\eta_i,\\theta)\\right\\}\\\\\n& = \\exp \\left\\{ -\\frac{1}{2} \\mathbf{u}^T\\tilde{\\mathbf{Q}}  \\mathbf{u} + \\tilde{\\mathbf{b}}\\mathbf{u}\\right\\}\n\\end{aligned}\n\\] Which means that we approximate \\(\\pi(\\mathbf{u}\\mid {\\theta},\\mathbf{y})\\) with\n\\[\n\\mathcal{N}(\\tilde{\\mathbf{Q}}^{-1}\\tilde{\\mathbf{b}},\\tilde{\\mathbf{Q}}^{-1})\\  \\text{ with   }\\ \\tilde{\\mathbf{Q}} = \\mathbf{Q} +\\begin{bmatrix}\n\\text{diag}(\\mathbf{c}) & 0\\\\\n0& 0\n\\end{bmatrix}\\qquad \\tilde{\\mathbf{b}} = [\\mathbf{b}\\ 0]^T\n\\]"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-gmfr-approximation---one-dimensional-example",
+    "href": "slides/slides_2.html#the-gmfr-approximation---one-dimensional-example",
+    "title": "Lecture 2",
+    "section": "The GMFR approximation - One dimensional example",
+    "text": "The GMFR approximation - One dimensional example\n\n\nAssume \\[\n\\begin{aligned}\n  y|\\lambda \\sim\\text{Poisson}(\\lambda)  & \\text{ Likelihood}\\\\\n  \\eta = \\log(\\lambda)  & \\text{ Predictor}\\\\\n  \\mathbf{u}  = \\eta & \\text{ Latent field }\\\\\n  x\\sim\\mathcal{N}(0,1) & \\text{ Latent Model}\n\\end{aligned}\n\\] we have that\n\\[\n\\begin{aligned}\n  \\pi(x|y) & \\propto\\pi(y|x)\\pi(x)\\\\\n  & \\propto\\exp\\{ -\\frac{1}{2}x^2+\n  \\underbrace{xy-\\exp(x)}_{\\text{non-gaussian part}}\n  \\}\n\\end{aligned}\n\\]"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-gmfr-approximation",
+    "href": "slides/slides_2.html#the-gmfr-approximation",
+    "title": "Lecture 2",
+    "section": "The GMFR approximation",
+    "text": "The GMFR approximation\n\n😄 Easy to compute\n😄 Exact for Gaussian likelihood\n😄 Good when you have little or a lot of data\n😄 inherits the same sparseness of \\(\\mathbf{u}\\)\n😟 No skewness"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-laplace-approximation",
+    "href": "slides/slides_2.html#the-laplace-approximation",
+    "title": "Lecture 2",
+    "section": "The Laplace Approximation",
+    "text": "The Laplace Approximation\n\n\n\\[\n\\begin{aligned}\n\\pi(\\mathbf{\\theta} \\mid  \\mathbf{y})  & \\propto \\frac{\n            \\pi( \\mathbf{y}\\mid \\mathbf{u},\\mathbf{\\theta})\\  \\pi(\\mathbf{\\theta})  \\pi( \\mathbf{u}\\mid \\mathbf{\\theta})  }\n            {\\pi(\\mathbf{u} \\mid \\mathbf{y},\n            \\mathbf{\\theta})}\\\\\n            & \\approx \\frac{\n            \\pi( \\mathbf{y}\\mid \\mathbf{u},\\mathbf{\\theta})\\  \\pi(\\mathbf{\\theta})  \\pi( \\mathbf{u}\\mid \\mathbf{\\theta})  }\n            {\\pi_G(\\mathbf{u} \\mid \\mathbf{y},\n            \\mathbf{\\theta})}  \\: \\Bigg|_{\\mathbf{u} = \\mathbf{u}^\\star(\\mathbf{\\theta})}\n\\end{aligned}\n\\]\nIf \\(\\theta\\) is low dimension we can actually compute this!\n\n\n\n\n\n\n\n\n\n\n\nThis is the Laplace approximation to \\(\\pi(\\theta|\\mathbf{y})\\) !"
+  },
+  {
+    "objectID": "slides/slides_2.html#the-inla-scheme",
+    "href": "slides/slides_2.html#the-inla-scheme",
+    "title": "Lecture 2",
+    "section": "The INLA scheme",
+    "text": "The INLA scheme\n\nApproximate \\(\\pi(\\theta|\\mathbf{y})\\) ✅\nApproximate \\(\\pi(u_i|\\theta,\\mathbf{y})\\)\nUse numerical integration to compute \\(\\pi(u_i|\\mathbf{y})\\) ✅"
+  },
+  {
+    "objectID": "slides/slides_2.html#approximating-the-posterior-for-the-latent-field.",
+    "href": "slides/slides_2.html#approximating-the-posterior-for-the-latent-field.",
+    "title": "Lecture 2",
+    "section": "Approximating the posterior for the latent field.",
+    "text": "Approximating the posterior for the latent field.\n\nNow we have an aproximation for \\(\\pi(\\theta|\\mathbf{y})\\)\nWe need an approximation for \\(\\pi(u_i|\\theta,\\mathbf{y})\\)\nThis is more difficult… \\(\\mathbf{u}\\) is large!! Anything we do we have to do it many times!\n\n\nCan we use the marginal from \\(\\pi_G(\\mathbf{u}|\\theta, \\mathbf{y})\\) ?"
+  },
+  {
+    "objectID": "slides/slides_2.html#unfortunately-it-is-not-accurate-enough",
+    "href": "slides/slides_2.html#unfortunately-it-is-not-accurate-enough",
+    "title": "Lecture 2",
+    "section": "…unfortunately it is not accurate enough!",
+    "text": "…unfortunately it is not accurate enough!\n\n\n\n\n\n\n\n\nFrom Rue and Martino 2007\n\n\nNotes:\n\nResults are quite accurate in general\nThere can be errors in the location and/or errors due to the lack of skewness…"
+  },
+  {
+    "objectID": "slides/slides_2.html#inla-and-variational-bayes",
+    "href": "slides/slides_2.html#inla-and-variational-bayes",
+    "title": "Lecture 2",
+    "section": "INLA and Variational Bayes",
+    "text": "INLA and Variational Bayes\n\nVariational Bayes techniques are used to improve the mean of the GMRF approximation \\(\\pi_G(\\mathbf{u}|\\theta, \\mathbf{y})\\)\nFrom this improved GMRF approximation we can compute the marginals \\(\\pi_G^*(u_i|\\theta,\\mathbf{y})\\) that can then be used to numerically compute: \\[\n\\tilde{\\pi}(u_i|\\mathbf{y}) = \\sum_k\\pi_G^*(u_i|\\theta, \\mathbf{y})\\tilde{\\pi}(\\theta|\\mathbf{y)}\\ w_k\n\\]\n\n\nNOTE:\n\nWe know the precision matrix \\(\\mathbf{Q}\\) of the GRMF approximation \\(\\pi_G^*(\\mathbf{u}|\\theta, \\mathbf{y})\\)\nEfficient algoriths to compute the marginal variance are used."
+  },
+  {
+    "objectID": "slides/slides_2.html#inla-posterior-sampling",
+    "href": "slides/slides_2.html#inla-posterior-sampling",
+    "title": "Lecture 2",
+    "section": "INLA posterior sampling",
+    "text": "INLA posterior sampling\nAlthough INLA mainly computes posterior marginals\n\n\\(\\pi(\\theta|\\mathbf{y})\\)\n\\(\\pi(u_i|\\mathbf{y})\\)\n\nINLA allowes to sample from the approximate posterior \\(\\pi(\\mathbf{u}|\\mathbf{y})\\)\nThis is important is one is interested in the posterior of functions of one or more parameters."
+  },
+  {
+    "objectID": "slides/slides_2.html#take-home-messages",
+    "href": "slides/slides_2.html#take-home-messages",
+    "title": "Lecture 2",
+    "section": "Take home messages!",
+    "text": "Take home messages!\n\nThe INLA methodology heavily relies on sparse matrices !\nGMRF are the key tool in INLA-friendly models\nINLA uses numerical approximation and numerical integration to provide efficient and precise approximations to posterior marginals\n\nBut ultimately….\n\nYou do not need to deeply understand all of this if you want to use inlabru to solve your (statistical) problems 😄"
+  },
+  {
+    "objectID": "slides/slides_2.html#good-news",
+    "href": "slides/slides_2.html#good-news",
+    "title": "Lecture 2",
+    "section": "Good news!",
+    "text": "Good news!\nRecall… we have computationally efficient and flexible methodology…\n\nwe can fit more (realistically) complex models…\ne.g. spatial and spatio-temporal models (to geo-referenced data, point pattern data, aerial data, spatio-temporal data…)\n\n\nUsing INLA + SPDE approach we can:\n\nfit complex models quickly\nflexibly fit joint models of more than one response variable\nmodel on complex domains, (e.g. the sphere = the earth)\nobservation areas with barriers (islands, archipelagos…)"
+  },
+  {
+    "objectID": "slides/slides_2.html#how-to-use-the-inla-approach",
+    "href": "slides/slides_2.html#how-to-use-the-inla-approach",
+    "title": "Lecture 2",
+    "section": "How to use the INLA approach",
+    "text": "How to use the INLA approach\nThe INLA methodology is implemented in two R packages: R-INLA and inlabru.\nWhy do we (strongly) recommend inlabru:\n\n\nwrapper around R-INLA + extra functionality.\nmuch easier to fit spatial models\nfull support for sf and terra libraries\nmakes fitting of tricky models (e.g. multi-likelihood models, spatial point processes) less fiddly than R-INLA\ntakes observation process into account (e.g. for distance sampling, plot sampling); more on this later\nallows for non-linear predictors defined by general R expressions (this is done by linearizing and running the INLA approximation several times…)"
+  },
+  {
+    "objectID": "slides/slides_2.html#some-inlabru-shortcuts",
+    "href": "slides/slides_2.html#some-inlabru-shortcuts",
+    "title": "Lecture 2",
+    "section": "Some inlabru shortcuts",
+    "text": "Some inlabru shortcuts\nIn the slides we have fitted the model as:\n\ncmp = ~ -1 + beta0(1) beta1(covariate, model = \"linear\")\nformula = y ~ beta0 + beta1\nlik = bru_obs(formula = formula,\n              famuly  = \"gaussian\",\n              data = df)\nfit = bry(cmp, lik)\n\nbut in the practical you have\n\ncmp = ~ -1 + beta0(1) beta1(covariate, model = \"linear\")\n\nlik = bru_obs(formula = y~.,\n              famuly  = \"gaussian\",\n              data = df)\nfit = bry(cmp, lik)\n\n\n\nYou don’t have to define a formula outside of the bru_obs() function..it can be defines also inside the function!\n\n\n\n\nThe expression y ~ . just means “take all the components and sum them together”. It also tells the bru() function that your predictor is linear."
+  },
+  {
+    "objectID": "slides/slides_2.html#predict-and-generate-functions",
+    "href": "slides/slides_2.html#predict-and-generate-functions",
+    "title": "Lecture 2",
+    "section": "predict() and generate() functions",
+    "text": "predict() and generate() functions\nIn the practicals you have used the predict() function to get results from the fitted model.\n\npredict() simulates from the fitted posterior distribution \\(\\pi(\\mathbf{y}|\\mathbf{u},\\theta)\\), computes what you ask and produces a summary of the samples (mean, sd, quantiles, etc)\ngenerate() simulates from the fitted posterior distribution \\(\\pi(\\mathbf{y}|\\mathbf{u},\\theta)\\), computes what you ask and return the samples!"
+  },
+  {
+    "objectID": "slides/slides_2.html#example",
+    "href": "slides/slides_2.html#example",
+    "title": "Lecture 2",
+    "section": "Example",
+    "text": "Example\nLet’s fit the model for the Tokyo rainfall data \\[\n\\begin{aligned}\ny_t|\\eta_t&\\sim\\text{Bin}(n_t, p_t),\\qquad i = 1,\\dots,366\\\\\n\\eta_t &= \\text{logit}(p_t)= \\beta_0 + f(\\text{time}_t)\n\\end{aligned}\n\\]\n\ndata(\"Tokyo\")\ncmp= ~ -1 + Intercept(1) + time(time, model =\"rw2\")\nformula = y ~ Intercept + time\nlik = bru_obs(formula = formula,\n              data = Tokyo,\n              Ntrials = n,\n              family = \"binomial\")\nfit = bru(cmp, lik)\n\nWe now want to extract results…what do we want?\n\n\nThe time effect \\(f(\\text{time}_t)\\) ?\nThe linear predictor \\(\\eta_t = \\beta_0 + f(\\text{time}_t)\\)?\nThe estimated probability offit precipitation \\(p_t = \\text{inv_logit}(\\eta_t)\\) ?\n\nWe can get all of them with the predict() or generate() functions!"
+  },
+  {
+    "objectID": "slides/slides_2.html#example---predict",
+    "href": "slides/slides_2.html#example---predict",
+    "title": "Lecture 2",
+    "section": "Example - predict()",
+    "text": "Example - predict()\n\npreds1 = predict(object = fit, newdata = Tokyo, ~ time)\npreds2 = predict(object = fit, newdata = Tokyo, ~ Intercept + time)\ninv_logit = function(x) ((1 + exp(-x))^(-1))\npreds3 = predict(object = fit, newdata = Tokyo, ~ inv_logit(Intercept + time))\n\nor\n\ninv_logit = function(x) ((1 + exp(-x))^(-1))\npreds = predict(object = fit, newdata = Tokyo, \n                ~ data.frame(time_eff = time,\n                             lin_pred = Intercept + time,\n                             probs = inv_logit(Intercept + time)),\n                n.samples = 1000\n                )\n# preds is then a list                \nround(preds$probs[1:3,],3)\n\n  y n time  mean    sd q0.025  q0.5 q0.975 median sd.mc_std_err mean.mc_std_err\n1 0 2    1 0.174 0.082  0.053 0.158  0.367  0.158         0.003           0.003\n2 0 2    2 0.171 0.078  0.057 0.158  0.352  0.158         0.002           0.003\n3 1 2    3 0.169 0.074  0.061 0.157  0.344  0.157         0.002           0.002"
+  },
+  {
+    "objectID": "slides/slides_2.html#example---predict-1",
+    "href": "slides/slides_2.html#example---predict-1",
+    "title": "Lecture 2",
+    "section": "Example - predict()",
+    "text": "Example - predict()\n\npreds$probs %&gt;% ggplot() + geom_line(aes(time, mean)) +\n  geom_ribbon(aes(time, ymin = q0.025, ymax = q0.975), alpha = 0.5)"
+  },
+  {
+    "objectID": "slides/slides_2.html#example---generate",
+    "href": "slides/slides_2.html#example---generate",
+    "title": "Lecture 2",
+    "section": "Example - generate()",
+    "text": "Example - generate()\n\nsamples = generate(object = fit, newdata = Tokyo, \n                ~ data.frame(time_eff = time,\n                             lin_pred = Intercept + time,\n                             probs = inv_logit(Intercept + time)),\n                n.samples = 20\n                )\n# samples is now a list of length 20 (n.samples) each element of the list looks like:\n\nsamples[[1]][1:3,]\n\n   time_eff  lin_pred      probs\n1 -1.943108 -3.048701 0.04527357\n2 -1.801523 -2.907117 0.05180288\n3 -1.654153 -2.759747 0.05953852"
+  },
+  {
+    "objectID": "slides/slides_2.html#example---generate-1",
+    "href": "slides/slides_2.html#example---generate-1",
+    "title": "Lecture 2",
+    "section": "Example - generate()",
+    "text": "Example - generate()\n\ndata.frame(time = Tokyo$time, sapply(samples, function(x) x[,1])) %&gt;%\n  pivot_longer(-time) %&gt;%\n  ggplot() + geom_line(aes(time, value, group = name, color = factor(name))) +\n  theme(legend.position = \"none\")"
+  },
+  {
+    "objectID": "slides/slides_2.html#effects-of-categorical-variables-and-interactions",
+    "href": "slides/slides_2.html#effects-of-categorical-variables-and-interactions",
+    "title": "Lecture 2",
+    "section": "Effects of categorical variables and Interactions",
+    "text": "Effects of categorical variables and Interactions\nBoth this things require a little more thinking when using inlabru than when using lm or similar\n\nLet’s look at the mtcars dataset that is in R\n\n\n                   mpg cyl disp  hp drat    wt  qsec vs am gear carb\nMazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4\nMazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4\nDatsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1\nHornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1\nHornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2\nValiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1"
+  },
+  {
+    "objectID": "slides/slides_2.html#effects-of-categorical-variables",
+    "href": "slides/slides_2.html#effects-of-categorical-variables",
+    "title": "Lecture 2",
+    "section": "Effects of categorical variables",
+    "text": "Effects of categorical variables\nWe want to fit a model where rank is the only covariate.\ngear has three categories: 3 4``5\n\nm1 = lm(mpg~ gear, data = df)\nm1$coef\n\n(Intercept)       gear4       gear5 \n  16.106667    8.426667    5.273333 \n\n\nHow do we do this in inlabru?\n\n\nOption 1: Use the model.matrix() function in R\n\n\n# create the model matrix\ncov_effect = model.matrix(~ gear, data = df)\ncov_effect[1:2,]\n\n              (Intercept) gear4 gear5\nMazda RX4               1     1     0\nMazda RX4 Wag           1     1     0\n\n# attach this to your data\ndf = cbind(df, cov_effect[,-1])\n\ncmp1 = ~ Intercept(1) + gear_4(gear4, model = \"linear\") +\n  gear_5(gear5, model= \"linear\")\nlik1 = bru_obs(formula = mpg ~.,\n               data = df)\nfit1 = bru(cmp1, lik1)\nfit1$summary.fixed$mean\n\n[1] 16.103110  8.414869  5.253885"
+  },
+  {
+    "objectID": "slides/slides_2.html#effects-of-categorical-variables-1",
+    "href": "slides/slides_2.html#effects-of-categorical-variables-1",
+    "title": "Lecture 2",
+    "section": "Effects of categorical variables",
+    "text": "Effects of categorical variables\nWe want to fit a model where rank is the only covariate.\nrank has three categories: Prof AsstProf``AssocProf\n\nm1 = lm(mpg~ gear, data = df)\nm1$coefficients\n\n(Intercept)       gear4       gear5 \n  16.106667    8.426667    5.273333 \n\n\nHow do we do this in inlabru?\n\nOption 2: fixed effect are just random effects with fixed precision\n\n\ndf$gear_id = as.numeric(df$gear) # inlabru needs values like 1,2,3 for random effects\n\ncmp2 = ~ -1 +  gear_effect(gear_id, model = \"iid\", fixed = T,initial = -6)\n# or: cmp2 = ~ Intercept(1) +  gear_effect(gear_id, model = \"iid\", fixed = T,initial = -6, constr = T)\nlik2 = bru_obs(formula = mpg ~.,\n               data = df)\nfit2 = bru(cmp2, lik2)\nfit2$summary.random$gear_effect$mean\n\n[1] 16.04855 24.42278 21.15033\n\n\nWhat is happening here??\n\nThis is just a re-parametrization problem\n\nc(m1$coef[1], m1$coef[1] + m1$coef[2],m1$coef[1] + m1$coef[3])\n\n(Intercept) (Intercept) (Intercept) \n   16.10667    24.53333    21.38000"
+  },
+  {
+    "objectID": "slides/slides_2.html#interaction-between-two-categorical-variables",
+    "href": "slides/slides_2.html#interaction-between-two-categorical-variables",
+    "title": "Lecture 2",
+    "section": "Interaction between two categorical variables",
+    "text": "Interaction between two categorical variables\nSay we want to fit this model\n\ndf = mtcars %&gt;% mutate(gear = factor(gear), vs = factor(vs))\nm2 = lm(mpg ~ gear * vs, data = df)\n\n\n\n(Intercept)       gear4       gear5         vs1   gear4:vs1   gear5:vs1 \n  15.050000    5.950000    4.075000    5.283333   -1.043333    5.991667 \n\n\n\nHere the best solution is to use the model.matrix() again\n\n# create the model matrix\ncov_effect = model.matrix(~ gear * vs, data = df)\ncov_effect[1:1,]\n\n(Intercept)       gear4       gear5         vs1   gear4:vs1   gear5:vs1 \n          1           1           0           0           0           0 \n\ndf = cbind(df, cov_effect[,-1])       # attach this to your data\n\ncmp3 = ~ Intercept(1) + gear_4(gear4, model = \"linear\") +\n  gear_5(gear5, model = \"linear\") + vs_1(vs1, model = \"linear\") +\n  gear4_vs1(`gear4:vs1`, model = \"linear\") + gear5_vs1(`gear5:vs1`, model = \"linear\") \n\nlik3 = bru_obs(formula= mpg ~ ., data = df)\nfit3 = bru(cmp3, lik3)\nfit3$summary.fixed$mean\n\n[1] 15.0434782  5.8987519  4.0890059  5.2876193 -0.9881969  5.8812535"
+  },
+  {
+    "objectID": "slides/slides_2.html#interaction-categorical-and-continous-variable",
+    "href": "slides/slides_2.html#interaction-categorical-and-continous-variable",
+    "title": "Lecture 2",
+    "section": "Interaction categorical and continous variable",
+    "text": "Interaction categorical and continous variable\n\ndf = mtcars %&gt;% mutate(gear = factor(gear))\nm2 = lm(mpg ~ gear * disp, data = df)\n\n\n\n(Intercept)       gear4       gear5        disp  gear4:disp  gear5:disp \n24.51556635 15.05196338  7.14538044 -0.02577046 -0.09644222 -0.02500467 \n\n\n\nOption 1: Again we can use the model.matrix() option:\n\n# create the model matrix\ncov_effect = model.matrix(~ gear * disp, data = df)\ncov_effect[1:1,]\n\n(Intercept)       gear4       gear5        disp  gear4:disp  gear5:disp \n          1           1           0         160         160           0 \n\ncolnames(cov_effect)  = str_replace(colnames(cov_effect), \":\", \"_\")\ndf = cbind(df, cov_effect[,-c(1,4)])      # attach this to your data and remove duplicated columns\n\ncmp4 = ~ Intercept(1) + gear_4(gear4, model = \"linear\") +\n  gear_5(gear5, model = \"linear\") + disp(disp, model = \"linear\") +\n  gear4_disp(gear4_disp, model = \"linear\") + gear5_disp(gear5_disp, model = \"linear\") \n\nlik4 = bru_obs(formula= mpg ~ ., data = df)\nfit4 = bru(cmp4, lik4)\nfit4$summary.fixed$mean\n\n[1] 24.50107130 14.96916279  7.11472892 -0.02572928 -0.09575892 -0.02486892"
+  },
+  {
+    "objectID": "slides/slides_2.html#interaction-categorical-and-continous-variable-1",
+    "href": "slides/slides_2.html#interaction-categorical-and-continous-variable-1",
+    "title": "Lecture 2",
+    "section": "Interaction categorical and continous variable",
+    "text": "Interaction categorical and continous variable\n\ndf = mtcars %&gt;% mutate(gear = factor(gear))\nm2 = lm(mpg ~ gear * disp, data = df)\n\n\n\n(Intercept)       gear4       gear5        disp  gear4:disp  gear5:disp \n24.51556635 15.05196338  7.14538044 -0.02577046 -0.09644222 -0.02500467 \n\n\nOption 2: fixed effects are random effect with fixed precision!\n\ndf$gear_id = as.numeric(df$gear) # inlabru needs values like 1,2,3 for random effects\n\ncmp5 = ~ -1 +  gear_effect_int(gear_id, model = \"iid\", fixed = T,initial = -6) +\n  gear_effect_slope(gear_id, disp, model = \"iid\", fixed = T,initial = -6)\nlik5 = bru_obs(formula = mpg ~.,\n               data = df)\nfit5 = bru(cmp5, lik5)\nfit5$summary.random$gear_effect_int$mean\n\n[1] 24.15643 38.93784 31.16888\n\nfit5$summary.random$gear_effect_slope$mean\n\n[1] -0.02475027 -0.11752394 -0.04884682\n\n\n\nAgain..the differences are a matter of parametrization!"
+  },
+  {
+    "objectID": "slides/slides_2.html#interaction-categorical-and-continous-variable-2",
+    "href": "slides/slides_2.html#interaction-categorical-and-continous-variable-2",
+    "title": "Lecture 2",
+    "section": "Interaction categorical and continous variable",
+    "text": "Interaction categorical and continous variable\n\npred_df = data.frame(disp = rep(seq(70:473),3),\n                     gear = factor(rep(3:5, each = length(seq(70:473))))) %&gt;%\n  mutate(gear_id = as.numeric(gear))\n\nlm_pred = cbind(pred_df, pred = predict(m2, newdata = pred_df))\n\ninla_pred = predict(fit5, pred_df, ~ gear_effect_int + gear_effect_slope)"
   }
 ]

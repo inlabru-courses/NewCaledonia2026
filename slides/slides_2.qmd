@@ -1,0 +1,406 @@
+---
+title: "Lecture 2"
+from: markdown+emoji
+subtitle: "Some practical tips on `inlabru` " 
+format:
+  revealjs:
+    margin: 0
+    logo:  NTNU_UofG.png
+    theme: uofg_theme.scss
+    footer: "<a href='../index.html'>Back to Home</a>"
+    header-includes: |
+      <script src="custom.js" type="application/javascript"></script>
+slide-number: "c/t"
+title-slide-attributes:
+#    data-background-image: images/trondheim3.png
+    data-background-size: cover
+    data-background-opacity: "0.55"
+author:
+  - name: Sara Martino
+    #orcid: 0000-0002-6879-4412
+    email: sara.martino@ntnu.no
+    affiliations: Dept. of Mathematical Science, NTNU
+  - name: Janine Illian
+    #orcid: 0000-0002-6879-4412
+    email: Janine.Illian@glasgow.ac.uk
+    affiliations: University of Glasgow 
+  - name: Jafet Belmont
+    #orcid: 0000-0002-6879-4412
+    email: Jafet.Belmont@glasgow.ac.uk
+    affiliations: University of Glasgow   
+        
+# date: May 22, 2025
+# bibliography: references.bib
+embed-resources: true
+execute:
+  allow-html: true
+  freeze: auto
+---
+
+
+```{r setup}
+# #| include: false
+
+knitr::opts_chunk$set(echo = FALSE,
+                      message=FALSE,
+                      warning=FALSE,
+                      strip.white=TRUE,
+                      prompt=FALSE,
+                      fig.align="center",
+                       out.width = "60%")
+
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library(png)
+library(tidyverse)
+library(INLA)
+library(BAS)
+library(patchwork)
+library(inlabru)
+
+```
+
+
+
+## Some `inlabru` shortcuts {.smaller}
+
+In the slides we have fitted the model as:
+
+```{r}
+#| echo: true
+#| eval: false
+cmp = ~ -1 + beta0(1) beta1(covariate, model = "linear")
+formula = y ~ beta0 + beta1
+lik = bru_obs(formula = formula,
+              famuly  = "gaussian",
+              data = df)
+fit = bry(cmp, lik)
+```
+
+but in the practical you have
+
+```{r}
+#| echo: true
+#| eval: false
+cmp = ~ -1 + beta0(1) beta1(covariate, model = "linear")
+
+lik = bru_obs(formula = y~.,
+              famuly  = "gaussian",
+              data = df)
+fit = bry(cmp, lik)
+```
+
+. . .
+
+1.  You *don't have to* define a formula outside of the `bru_obs()` function..it can be defines also inside the function!
+
+. . .
+
+2.  The expression `y ~ .` just means "take all the components and sum them together". It also tells the *bru()* function that your predictor is *linear*.
+
+## `predict()` and `generate()` functions
+
+In the practicals you have used the *predict()* function to get results from the fitted model.
+
+-   `predict()` *simulates* from the fitted posterior distribution $\pi(\mathbf{y}|\mathbf{u},\theta)$, computes what you ask and produces a summary of the samples (mean, sd, quantiles, etc)
+
+-   `generate()` *simulates* from the fitted posterior distribution $\pi(\mathbf{y}|\mathbf{u},\theta)$, computes what you ask and return the samples!
+
+## Example {.smaller}
+
+Let's fit the model for the Tokyo rainfall data $$
+\begin{aligned}
+y_t|\eta_t&\sim\text{Bin}(n_t, p_t),\qquad i = 1,\dots,366\\
+\eta_t &= \text{logit}(p_t)= \beta_0 + f(\text{time}_t)
+\end{aligned}
+$$
+
+```{r}
+#| echo: true
+data("Tokyo")
+cmp= ~ -1 + Intercept(1) + time(time, model ="rw2")
+formula = y ~ Intercept + time
+lik = bru_obs(formula = formula,
+              data = Tokyo,
+              Ntrials = n,
+              family = "binomial")
+fit = bru(cmp, lik)
+```
+
+We now want to extract results...what do we want?
+
+. . .
+
+-   The time effect $f(\text{time}_t)$ ?
+-   The linear predictor $\eta_t = \beta_0 + f(\text{time}_t)$?
+-   The estimated probability offit precipitation $p_t = \text{inv_logit}(\eta_t)$ ?
+
+We can get all of them with the `predict()` or `generate()` functions!
+
+## Example - `predict()`
+
+```{r}
+#| echo: true
+#| eval: false
+preds1 = predict(object = fit, newdata = Tokyo, ~ time)
+preds2 = predict(object = fit, newdata = Tokyo, ~ Intercept + time)
+inv_logit = function(x) ((1 + exp(-x))^(-1))
+preds3 = predict(object = fit, newdata = Tokyo, ~ inv_logit(Intercept + time))
+```
+
+or
+
+```{r}
+#| echo: true
+#| eval: true
+inv_logit = function(x) ((1 + exp(-x))^(-1))
+preds = predict(object = fit, newdata = Tokyo, 
+                ~ data.frame(time_eff = time,
+                             lin_pred = Intercept + time,
+                             probs = inv_logit(Intercept + time)),
+                n.samples = 1000
+                )
+# preds is then a list                
+round(preds$probs[1:3,],3)
+```
+
+## Example - `predict()`
+
+```{r}
+#| echo: true
+preds$probs %>% ggplot() + geom_line(aes(time, mean)) +
+  geom_ribbon(aes(time, ymin = q0.025, ymax = q0.975), alpha = 0.5)
+```
+
+## Example - `generate()`
+
+```{r}
+#| echo: true
+#| eval: true
+samples = generate(object = fit, newdata = Tokyo, 
+                ~ data.frame(time_eff = time,
+                             lin_pred = Intercept + time,
+                             probs = inv_logit(Intercept + time)),
+                n.samples = 20
+                )
+# samples is now a list of length 20 (n.samples) each element of the list looks like:
+
+samples[[1]][1:3,]
+```
+
+## Example - `generate()`
+
+```{r}
+#| echo: true
+
+data.frame(time = Tokyo$time, sapply(samples, function(x) x[,1])) %>%
+  pivot_longer(-time) %>%
+  ggplot() + geom_line(aes(time, value, group = name, color = factor(name))) +
+  theme(legend.position = "none")
+
+```
+
+## Effects of categorical variables and Interactions
+
+Both this things require a little more thinking when using `inlabru` than when using `lm` or similar
+
+. . .
+
+Let's look at the `mtcars` dataset that is in `R`
+
+```{r}
+df = mtcars %>% mutate(gear = factor(gear))
+head(df)
+
+```
+
+## Effects of categorical variables {.smaller}
+
+We want to fit a model where `rank` is the only covariate.
+
+`gear` has three categories: `3` ``` 4``5 ```
+
+```{r}
+#| echo: true
+m1 = lm(mpg~ gear, data = df)
+m1$coef
+```
+
+How do we do this in `inlabru`?
+
+. . .
+
+-   Option 1: Use the `model.matrix()` function in `R`
+
+```{r}
+#| echo: true
+# create the model matrix
+cov_effect = model.matrix(~ gear, data = df)
+cov_effect[1:2,]
+
+# attach this to your data
+df = cbind(df, cov_effect[,-1])
+
+cmp1 = ~ Intercept(1) + gear_4(gear4, model = "linear") +
+  gear_5(gear5, model= "linear")
+lik1 = bru_obs(formula = mpg ~.,
+               data = df)
+fit1 = bru(cmp1, lik1)
+fit1$summary.fixed$mean
+```
+
+## Effects of categorical variables {.smaller}
+
+We want to fit a model where `rank` is the only covariate.
+
+`rank` has three categories: `Prof` ``` AsstProf``AssocProf ```
+
+```{r}
+#| echo: true
+m1 = lm(mpg~ gear, data = df)
+m1$coefficients
+```
+
+How do we do this in `inlabru`?
+
+-   Option 2: fixed effect are just random effects with fixed precision
+
+```{r}
+#| echo: true
+
+df$gear_id = as.numeric(df$gear) # inlabru needs values like 1,2,3 for random effects
+
+cmp2 = ~ -1 +  gear_effect(gear_id, model = "iid", fixed = T,initial = -6)
+# or: cmp2 = ~ Intercept(1) +  gear_effect(gear_id, model = "iid", fixed = T,initial = -6, constr = T)
+lik2 = bru_obs(formula = mpg ~.,
+               data = df)
+fit2 = bru(cmp2, lik2)
+fit2$summary.random$gear_effect$mean
+```
+
+What is happening here??
+
+. . .
+
+This is just a re-parametrization problem
+
+```{r}
+#| echo: true
+c(m1$coef[1], m1$coef[1] + m1$coef[2],m1$coef[1] + m1$coef[3])
+```
+
+## Interaction between two categorical variables {.smaller}
+
+Say we want to fit this model
+
+```{r}
+#| echo: true
+df = mtcars %>% mutate(gear = factor(gear), vs = factor(vs))
+m2 = lm(mpg ~ gear * vs, data = df)
+```
+
+```{r}
+m2$coef
+```
+
+. . .
+
+Here the best solution is to use the `model.matrix()` again
+
+```{r}
+#| echo: true
+# create the model matrix
+cov_effect = model.matrix(~ gear * vs, data = df)
+cov_effect[1:1,]
+df = cbind(df, cov_effect[,-1])       # attach this to your data
+
+cmp3 = ~ Intercept(1) + gear_4(gear4, model = "linear") +
+  gear_5(gear5, model = "linear") + vs_1(vs1, model = "linear") +
+  gear4_vs1(`gear4:vs1`, model = "linear") + gear5_vs1(`gear5:vs1`, model = "linear") 
+
+lik3 = bru_obs(formula= mpg ~ ., data = df)
+fit3 = bru(cmp3, lik3)
+fit3$summary.fixed$mean
+```
+
+## Interaction categorical and continous variable
+
+```{r}
+#| echo: true
+df = mtcars %>% mutate(gear = factor(gear))
+m2 = lm(mpg ~ gear * disp, data = df)
+```
+
+```{r}
+m2$coef
+```
+
+. . .
+
+Option 1: Again we can use the `model.matrix()` option:
+
+```{r}
+#| echo: true
+# create the model matrix
+cov_effect = model.matrix(~ gear * disp, data = df)
+cov_effect[1:1,]
+colnames(cov_effect)  = str_replace(colnames(cov_effect), ":", "_")
+df = cbind(df, cov_effect[,-c(1,4)])      # attach this to your data and remove duplicated columns
+
+cmp4 = ~ Intercept(1) + gear_4(gear4, model = "linear") +
+  gear_5(gear5, model = "linear") + disp(disp, model = "linear") +
+  gear4_disp(gear4_disp, model = "linear") + gear5_disp(gear5_disp, model = "linear") 
+
+lik4 = bru_obs(formula= mpg ~ ., data = df)
+fit4 = bru(cmp4, lik4)
+fit4$summary.fixed$mean
+```
+
+## Interaction categorical and continous variable
+
+```{r}
+#| echo: true
+df = mtcars %>% mutate(gear = factor(gear))
+m2 = lm(mpg ~ gear * disp, data = df)
+```
+
+```{r}
+m2$coef
+```
+
+Option 2: fixed effects are random effect with fixed precision!
+
+```{r}
+#| echo: true
+df$gear_id = as.numeric(df$gear) # inlabru needs values like 1,2,3 for random effects
+
+cmp5 = ~ -1 +  gear_effect_int(gear_id, model = "iid", fixed = T,initial = -6) +
+  gear_effect_slope(gear_id, disp, model = "iid", fixed = T,initial = -6)
+lik5 = bru_obs(formula = mpg ~.,
+               data = df)
+fit5 = bru(cmp5, lik5)
+fit5$summary.random$gear_effect_int$mean
+fit5$summary.random$gear_effect_slope$mean
+```
+
+. . .
+
+Again..the differences are a matter of parametrization!
+
+## Interaction categorical and continous variable
+
+```{r}
+#| echo: true
+pred_df = data.frame(disp = rep(seq(70:473),3),
+                     gear = factor(rep(3:5, each = length(seq(70:473))))) %>%
+  mutate(gear_id = as.numeric(gear))
+
+lm_pred = cbind(pred_df, pred = predict(m2, newdata = pred_df))
+
+inla_pred = predict(fit5, pred_df, ~ gear_effect_int + gear_effect_slope)
+```
+
+```{r}
+ggplot()  + geom_line(data = inla_pred, aes(disp, mean, group= gear, color = gear)) + geom_ribbon(data = inla_pred, aes(disp, ymin = q0.025, ymax = q0.975,  mean, group= gear, fill = gear), alpha = 0.5)+ geom_line(data = lm_pred, aes(disp, pred, group= gear))
+
+```
