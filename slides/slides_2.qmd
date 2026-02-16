@@ -10,6 +10,9 @@ format:
     footer: "<a href='../index.html'>Back to Home</a>"
     header-includes: |
       <script src="custom.js" type="application/javascript"></script>
+    toc: true
+    toc-depth: 1
+    toc-title: ""
 slide-number: "c/t"
 title-slide-attributes:
 #    data-background-image: images/trondheim3.png
@@ -37,6 +40,12 @@ execute:
   freeze: auto
 ---
 
+
+
+<!-- TODO: -->
+
+<!-- 1. _latent suffix -->
+<!-- 2. how inla treats missing values -->
 
 ```{r setup}
 # #| include: false
@@ -120,6 +129,7 @@ fit <- bru(comps, lik, ...)
 We are going to talk a bit more about the components 
 :::
 
+# Basic `component` features
 
 ## Basic `component` features{.smaller}
 
@@ -148,6 +158,7 @@ The basic syntax for components is:
 - `time_effect(time, model= "rw2")` defines the smooth effect of `time` on the predictor.
 
 
+# Shortcuts
 
 ## Some `inlabru` shortcuts {.smaller}
 
@@ -803,18 +814,127 @@ samples[[1]][1:3,]
 ```{r}
 #| echo: true
 
-data.frame(time = Tokyo$time, sapply(samples, function(x) x[,1])) %>%
+data.frame(time = Tokyo$time, sapply(samples, function(x) x$probs)) %>%
   pivot_longer(-time) %>%
   ggplot() + geom_line(aes(time, value, group = name, color = factor(name))) +
   theme(legend.position = "none")
 
 ```
 
+## The `_latent` suffix
+
+- Sometimes, one wants to sample directly from latent parameters
+without specifying any new input data (or, in other words, to sample with an identity projection
+matrix)
+
+- The keyword `_latent` can be appended to a latent component name to retrieve that
+
+For example, the following code recovers the intercept and the time effect at day 13
+```{r}
+#| echo: true
+
+p = predict(object = fit, newdata = c(), ~ data.frame(int = Intercept_latent,
+                                                      f_1 = time_latent[13]))
+```
+
+**NOTE** Here the `newdata` is just an empty object
+
+
+
+
+
+
+# `NA`s in `inlabru`
+
+## Missing values in `inlabru`
+
+The `bru()` function treats missing values in the dataset differently according to their role in the model.
+
+Take the model definition:
+```{r}
+#| echo: true
+#| eval: false
+
+cmp = ~ Intercept(1) + covariate(x, model = "linear") + random(z, model = "iid")
+formula = y ~ Intercept + covariate + random
+```
+
+- **`NA`'s in the response `y`**
+
+  If `y[i] = NA`, this means that y[i] is not observed, hence gives no contribution to the likelihood.
+
+- **`NA`'s in fixed effect `x`**
+
+  If `x[i] = NA` this means that `x[i]` is not part of the linear predictor for `y[i]`. 
+  For fixed effects, this is equivalent to `x[i]=0`, hence internally we make this change: `x[is.na(x)] = 0`
+
+- **`NA`'s in random effect `z`**
+
+  If `z[i] = NA`, this means that the random effect does not contribute to the linear predictor for `y[i]`.
+
+
+## Can `inlabru` deal with missing covariates?
+
+No, `inlabru` has no way to `impute' or integrate-out missing covariates. 
+
+You have to adjust your model to account for missing covariates. 
+
+Sometimes, you can formulate a joint model for the data and the covariates, but this is case-specific. 
+
+## Missing values when using `model = "fixed"` {.smaller}
+
+When we use the `model = "fixed"` missing values can give error:
+
+
+```{r}
+#| echo: true
+#| eval: true
+#| error: true
+#| 
+df = data.frame(y = rnorm(5),
+           x = as.factor(c("a","b", NA, "b", "a")))
+cmp = ~ -1  + fixed(~x, model = "fixed")
+lik = bru_obs(formula = y~.,
+              data = df)
+fit = bru(cmp, lik)
+```
+
+. . .
+
+The problem here is related to the `model.matrix()` function that is internally run and that, by default, removes the missing values
+
+```{r}
+#| echo: true
+
+dim(df)
+dim(model.matrix(~x, data = df))
+```
+This makes the length of the response (5) different from the length of the covariate (4).
+
+. . . 
+
+One solution is to force `model.matrix()` not to remove the missing values
+```{r}
+#| echo: true
+
+options(na.action = "na.pass")
+fit = bru(cmp, lik)
+fit$summary.random$fixed[,c(1:4)]
+```
+
+**WARNING** this is a **global** options, it might interfere with other part of your code!
+
+
+
+# Take home message
+
 ## Take home message
 
 - Linear models with interactions
 
   - `inlabru` has a special model to implemement this
-  - but it is also wortht o understand that "fixed effects are _just_ random efffects with fixed precision :smile:
+  - but it is also worth to understand that "fixed effects are _just_ random efffects with fixed precision :smile:
   
 - `predict()` and `generate()` functions are powerful tools (based on sampling from the posterior distribution) to obtain many interesting results!
+
+- missing values are usually not a problem but in some cases have to be treated carefully.
