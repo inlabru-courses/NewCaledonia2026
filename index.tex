@@ -235,7 +235,7 @@
 \@ifundefined{codebgcolor}{\definecolor{codebgcolor}{named}{light}}{}
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, enhanced, frame hidden, boxrule=0pt, breakable, colback={codebgcolor}]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, frame hidden, colback={codebgcolor}, enhanced, breakable, boxrule=0pt]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -313,23 +313,95 @@ No knowledge of \texttt{R-INLA} or \texttt{inlabru} is required.
 
 \section{Schedule}\label{schedule-tabs}
 
+\textbf{NOTE} The schedule is indicative and some changes might come!
+
 \subsubsection{Day 1}
 
-: \{.striped .hover\}
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\centering\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Time
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Topic
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+10:00 - 10:30 & Welcome \\
+10:30 - 11:30 & \href{slides/slides_1.html}{\textbf{Session 1}:
+Introduction to \texttt{inlabru}} \\
+11:30 - 13:00 & \href{slides/slides_2.html}{\textbf{Session 2}: Some
+practical tips on \texttt{inlabru}} \\
+13:00 - 14:30 & Lunch break 🍽️ \\
+14:30 - 15:30 & \href{practicals/LMM_ex.qmd}{Practical Session 1} \\
+15:30 - 15:45 & Coffee Break ☕ \\
+15:45 - 16:45 & \href{practicals/LMM_ex.qmd}{Practical Session 2} \\
+16:45 - 17:00 & wrap-up and outlook \\
+\end{longtable}
 
 \subsubsection{Day 2}
 
-: \{.striped .hover\}
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\centering\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Time
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Topic
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+10:00 - 10:30 & Welcome \\
+10:30 - 11:30 & \href{slides/slides_3.html}{\textbf{Session 3}: Time
+Series Models} \\
+11:30 - 13:00 & \href{day2_practical_3.html}{Practical Session 3} \\
+13:00 - 14:30 & Lunch break 🍽️ \\
+14:30 - 15:30 &
+\href{Slides_Janine_pdf/slides_5_inlabru.pdf}{\textbf{Session 4}:
+Introduction to Spatial Statistics} \\
+15:30 - 15:45 & Coffee Break ☕ \\
+15:45 - 16:45 & \href{day2_practical_4.html}{Practical Session 4} \\
+16:45 - 17:00 & wrap-up and outlook \\
+\end{longtable}
 
 \subsubsection{Day 3}
 
-: \{.striped .hover\}
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\centering\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Time
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Topic
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+10:00 - 10:30 & Welcome \\
+10:30 - 11:30 &
+\href{Slides_Janine_pdf/slides_6_inlabru.pdf}{\textbf{Session 5}: Areal
+processes} \\
+11:30 - 13:00 &
+\href{(Slides_Janine_pdf/slides_7_inlabru.pdf)}{\textbf{Session 6}:
+Geostatistics} \\
+13:00 - 14:30 & Lunch break 🍽️ \\
+14:30 - 15:30 &
+\href{(Slides_Janine_pdf/slides_8_inlabru.pdf)}{\textbf{Session 7}:
+Point Processes} \\
+15:30 - 15:45 & Coffee Break ☕ \\
+15:45 - 16:45 & \href{day3_practical_5.html}{Practical Session 5} \\
+16:45 - 17:00 & wrap-up and outlook \\
+\end{longtable}
 
 \subsubsection{Day 4}
-
-: \{.striped .hover\}
-
-\subsubsection{Day 5}
 
 : \{.striped .hover\}
 

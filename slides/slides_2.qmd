@@ -729,7 +729,8 @@ res %>% ggplot() + geom_line(aes(disp, mean, group = gear, color = gear)) +
 
 ## Yet another example {.smaller}
 
-Let's fit the model for the Tokyo rainfall data $$
+Let's fit the model for the Tokyo rainfall data 
+$$
 \begin{aligned}
 y_t|\eta_t&\sim\text{Bin}(n_t, p_t),\qquad i = 1,\dots,366\\
 \eta_t &= \text{logit}(p_t)= \beta_0 + f(\text{time}_t)
@@ -923,6 +924,73 @@ fit$summary.random$fixed[,c(1:4)]
 ```
 
 **WARNING** this is a **global** options, it might interfere with other part of your code!
+
+
+## Getting help while using `inlabru`
+
+## Which priors have I used?
+
+You might wonder which priors have you used in your model..
+
+```{r}
+#| echo: true
+#| eval: false
+fit = bru(cmp, lik)
+
+INLA::inla.priors.used(fit)
+
+```
+
+**NB** `inla.priors.used` is a function of the `INLA` package, so you need to load it explicitly.
+
+## Getting help!
+
+The `inla.doc()` function provides help on the different  prior, latent models and likelihood.
+
+```{r}
+#| echo: true
+#| eval: false
+
+inla.doc("ar1")
+inla.doc("pc.prior")
+inla.doc("gaussian")
+```
+
+## Which models are implemented?
+
+
+**Likelihoods**
+
+```{r}
+#| echo: true
+#| eval: true
+# which likelihoods?
+inla.list.models("likelihood")
+```
+
+## Which models are implemented?
+
+
+**Components**
+
+```{r}
+#| echo: true
+#| eval: true
+# which latent models? (components)
+inla.list.models("latent")
+```
+
+## Which models are implemented?
+
+
+**Priors**
+
+```{r}
+#| echo: true
+#| eval: true
+# which priors?
+inla.list.models("prior")
+```
 
 
 
