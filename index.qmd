@@ -17,7 +17,13 @@ editor_options:
 -   Welcome to the `inlabru` workshop!
 -   The aim of this workshop is to introduce you to a range of statistical modelling approaches, in particular the temporal, spatial and spatio-temporal modelling as implemented in the `inlabru` package.
 -   Workshop materials are available in the github repository
--   ⚠️**Important!** ⚠️ Please use the instructions provided [here](Install_software.qmd) to install and check your installation *before* the course start.
+
+::: {.callout-warning}
+##  Important! ⚠️
+
+ Please use the instructions provided [here](Install_software.qmd) to install and check your installation
+  *before* the course start.
+:::
 
 # Learning Objectives for the workshop
 
@@ -66,14 +72,16 @@ No knowledge of `R-INLA` or `inlabru` is required.
 : {.striped .hover}
 
 
+
 | Time | Topic |
 |:----------------------------------:|:----------------------------------:|
-| 10:00 - 10:30 | Welcome |
-| 10:30 - 11:30 | [**Session 3**: Time Series Models](slides/slides_3.html) |
-| 11:30 - 13:00 | [Practical Session 3](day2_practical_3.html) |
+| 9:00 - 10:00 | [**Session 3**: Time Series Models](slides/slides_3.html) |
+| 10:00 - 10:30 | Snack 🥙 |
+| 10:30 - 11:30 | [**Session 3 cont.**: Time Series Models](slides/slides_3.html) |
+| 11:30 - 13:00 |[Practical Session 3](day2_practical_3.html) |
 | 13:00 - 14:30 | Lunch break 🍽️ |
 | 14:30 - 15:30 | [**Session 4**: Introduction to Spatial Statistics](Slides_Janine_pdf/slides_5_inlabru.pdf) |
-| 15:30 - 15:45 | Coffee Break ☕ |
+| 15:35 - 15:45 | Coffee Break ☕ |
 | 15:45 - 16:45 | [Practical Session 4](day2_practical_4.html) |
 | 16:45 - 17:00 | wrap-up and outlook |
 
@@ -83,17 +91,18 @@ No knowledge of `R-INLA` or `inlabru` is required.
 : {.striped .hover}
 
 
-
 | Time | Topic |
 |:----------------------------------:|:----------------------------------:|
-| 10:00 - 10:30 | Welcome |
-| 10:30 - 11:30 | [**Session 5**: Areal processes](Slides_Janine_pdf/slides_6_inlabru.pdf) |
-| 11:30 - 13:00 | [**Session 6**: Geostatistics]((Slides_Janine_pdf/slides_7_inlabru.pdf)) |
+| 9:00 - 10:00 | [**Session 5**: Areal processes](Slides_Janine_pdf/slides_6_inlabru.pdf) |
+| 10:00 - 10:30 | Snack 🥙 |
+| 10:30 - 11:30 |  [**Session 6**: Geostatistics](Slides_Janine_pdf/slides_7_inlabru.pdf) |
+| 11:30 - 13:00 |  [Practical Session 5](day3_practical_5.html) |
 | 13:00 - 14:30 | Lunch break 🍽️ |
-| 14:30 - 15:30 | [**Session 7**: Point Processes]((Slides_Janine_pdf/slides_8_inlabru.pdf)) |
-| 15:30 - 15:45 | Coffee Break ☕ |
-| 15:45 - 16:45 | [Practical Session 5](day3_practical_5.html) |
+| 14:30 - 15:30 | [**Session 7**: Point Processes](Slides_Janine_pdf/slides_8_inlabru.pdf) |
+| 15:35 - 15:45 | Coffee Break ☕ |
+| 15:45 - 16:45 | [Practical Session 5 (continued)](day3_practical_5.html) |
 | 16:45 - 17:00 | wrap-up and outlook |
+
 
 
 ### Day 4
@@ -101,3 +110,14 @@ No knowledge of `R-INLA` or `inlabru` is required.
 : {.striped .hover}
 
 
+| Time | Topic |
+|:----------------------------------:|:----------------------------------:|
+| 9:00 - 10:00 | [**Session 8**: Spatiotemporal models]() |
+| 10:00 - 10:30 | Snack 🥙 |
+| 10:30 - 11:30 | [**Session 9**: Model comparison and evaluation]() |
+| 11:30 - 13:00 | [Practical Session 6](day4_practical_6.qmd) |
+| 13:00 - 14:30 | Lunch break 🍽️ |
+| 14:30 - 15:30 | [**Session 10**: Multi-likelihood/joint likelihood models](Slides_Janine_pdf/slides_11_inlabru.pdf) |
+| 15:35 - 15:45 | Coffee Break ☕ |
+| 15:45 - 16:45 | [Practical Session 7](day4_practical_7.qmd) |
+| 16:45 - 17:00 | [Closing session](slides/slides_Closing_Remarks.qmd)|
