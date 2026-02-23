@@ -323,18 +323,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Time used:
-    Pre = 0.535, Running = 0.255, Post = 0.00939, Total = 0.8 
+    Pre = 0.547, Running = 0.193, Post = 0.00884, Total = 0.749 
 Fixed effects:
-             mean    sd 0.025quant 0.5quant 0.975quant  mode kld
-(Intercept) 9.953 0.102      9.753    9.953     10.154 9.953   0
+              mean    sd 0.025quant 0.5quant 0.975quant   mode kld
+(Intercept) 10.085 0.093      9.902   10.085     10.269 10.085   0
 
 Model hyperparameters:
-                                         mean    sd 0.025quant 0.5quant
-Precision for the Gaussian observations 0.977 0.137      0.726     0.97
-                                        0.975quant  mode
-Precision for the Gaussian observations       1.26 0.957
+                                        mean    sd 0.025quant 0.5quant
+Precision for the Gaussian observations 1.17 0.164      0.869     1.16
+                                        0.975quant mode
+Precision for the Gaussian observations       1.51 1.15
 
-Marginal log-Likelihood:  -155.92 
+Marginal log-Likelihood:  -146.84 
  is computed 
 Posterior summaries for the linear predictor and the fitted values are computed
 (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</code></pre>
@@ -349,7 +349,7 @@ Posterior summaries for the linear predictor and the fitted values are computed
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>inlabru version: 2.13.0.9032 
+<pre><code>inlabru version: 2.13.0.9033 
 INLA version: 26.02.06 
 Latent components:
 Intercept: main = linear(1)
@@ -362,18 +362,18 @@ Observation models:
     Additive/Linear/Rowwise: TRUE/TRUE/TRUE
     Used components: effect[Intercept], latent[] 
 Time used:
-    Pre = 0.426, Running = 0.184, Post = 0.0143, Total = 0.624 
+    Pre = 0.489, Running = 0.186, Post = 0.0141, Total = 0.69 
 Fixed effects:
-           mean    sd 0.025quant 0.5quant 0.975quant  mode kld
-Intercept 9.953 0.102      9.753    9.953     10.154 9.953   0
+            mean    sd 0.025quant 0.5quant 0.975quant   mode kld
+Intercept 10.085 0.093      9.902   10.085     10.269 10.085   0
 
 Model hyperparameters:
-                                         mean    sd 0.025quant 0.5quant
-Precision for the Gaussian observations 0.977 0.137      0.726     0.97
-                                        0.975quant  mode
-Precision for the Gaussian observations       1.26 0.957
+                                        mean    sd 0.025quant 0.5quant
+Precision for the Gaussian observations 1.17 0.164      0.869     1.16
+                                        0.975quant mode
+Precision for the Gaussian observations       1.51 1.15
 
-Marginal log-Likelihood:  -160.38 
+Marginal log-Likelihood:  -151.30 
  is computed 
 Posterior summaries for the linear predictor and the fitted values are computed
 (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</code></pre>
