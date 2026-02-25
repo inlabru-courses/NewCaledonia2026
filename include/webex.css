@@ -3,7 +3,7 @@
   --incorrect_alpha: #edaddd;
   --correct: #59935B;
   --correct_alpha: #c0edc2;
-  --highlight: #467AAC;
+  --highlight: #9CC9EE;
 }
 
 .webex-check {}
@@ -116,5 +116,33 @@ input.webex-solveme.webex-correct,
 
 .webex-radiogroup {
   margin: 1em 0;
+}
+
+
+
+/* ============================= */
+/* Navbar logo resizing */
+/* ============================= */
+
+.navbar-brand img {
+  max-height: 90px !important;   /* change to 60px, 80px, etc. */
+}
+
+.navbar {
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+}
+
+/* ============================= */
+/* Navbar font adjustments */
+/* ============================= */
+
+.navbar-nav .nav-link {
+  font-size: 1.3rem;   /* increase size (default ~1rem) */
+  font-weight: 500;     /* slightly stronger text */
+}
+
+.navbar-brand {
+  font-size: 1.3rem;    /* makes site title larger */
 }
 

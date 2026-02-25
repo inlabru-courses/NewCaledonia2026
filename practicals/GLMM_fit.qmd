@@ -1,0 +1,128 @@
+---
+title: "Practical 2 - GLMM"
+format: 
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+  PrettyPDF-pdf:
+    keep-tex: true
+    number-sections: true
+embed-resources: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(webexercises)
+
+```
+
+In this practical we are going to fit a Generalized (Mixed) Linear Model in `inlabru`.
+
+We are going to:
+
+- Fit a Poisson regression
+- Change the prior distributions for the model hyperparameters
+- Compute and visualize posterior densities and summaries for marginal effects
+ 
+ 
+ We start by loading some useful libraries 
+ 
+```{r}
+#| warning: false
+#| message: false
+
+library(dplyr)
+library(INLA)
+library(ggplot2)
+library(patchwork)
+library(inlabru)     
+library(MASS)
+
+```
+
+In this practical we are going to analyse the dataset `eagles`. The data, contained  in the library `MASS`, are records of salmon pirating attempts by Bald Eagles in Washington State. See `?eagles` for details. 
+
+While one eagle feeds, sometimes another will swoop in and try to steal the salmon from it. Call the feeding eagle the “victim” and
+the thief the “pirate.”
+
+```{r}
+data(eagles)
+?eagles
+print(eagles)
+```
+
+## Fitting Poisson regression
+```{r}
+library(MASS)
+data(eagles)
+eagles = eagles %>% 
+  mutate(P = ifelse(P == "L", 1,0),
+         A = ifelse(A == "A", 1,0),
+         V = ifelse(V == "L", 1,0),
+         )
+```
+
+
+```{r}
+cmp = ~ Intercept(1) + fixed(~ -1 + P + A + V, model = "fixed")
+lik = bru_obs(formula = y ~ .,
+              N  = n,
+              family = "binomial",
+              data = eagles)
+fit1 = bru(cmp, lik)
+
+cmp = ~ Intercept(1) + fixed( V, model = "iid", initial  = 0.1, fixed = T)
+
+
+
+```
+
+
+
+
+```{r}
+cmp = ~ Intercept(1, prec.linear = 0.02) + fixed(~ -1 + P + A + V, model = "fixed", hyper = list(prec = list(initial = log(0.01), fixed = T)))
+lik = bru_obs(formula = y ~ .,
+              N  = n,
+              family = "binomial",
+              data = eagles)
+fit2 = bru(cmp, lik)
+```
+
+
+
+```{r}
+
+library(lme4)
+data("grouseticks")
+
+head(grouseticks)
+
+
+grouseticks  = grouseticks %>%
+  group_by(BROOD, YEAR) %>%
+  mutate(ij = cur_group_id()) %>%
+  ungroup() %>%
+  mutate(ijk = seq_along(INDEX))
+
+cmp= ~ -1 + year(YEAR, model = "iid", fixed = T, initial = log(0.01)) +
+  height(HEIGHT, model =  "linear") + 
+  brood_year(ij , model = "iid") +
+  brood_year_chicken(ijk, model= "iid")
+
+lik = bru_obs(TICKS ~ .,
+              data = grouseticks,
+              family = "Poisson")
+
+  
+fit = bru(cmp, lik)
+
+```
+
+ 

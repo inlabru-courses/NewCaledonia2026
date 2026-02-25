@@ -251,13 +251,13 @@
 \@ifundefined{codebgcolor}{\definecolor{codebgcolor}{named}{light}}{}
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, sharp corners, enhanced, colback={codebgcolor}, frame hidden]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, enhanced, colback={codebgcolor}, breakable, frame hidden, sharp corners]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
-  pdftitle={inlabru Workshop},
+  pdftitle={Spatio-temporal models with inlabru},
   pdfauthor={Jafet Belmont, Sara Martino and Janine Illian},
   colorlinks=true,
   linkcolor={highlight},
@@ -267,7 +267,14 @@
   pdfcreator={LaTeX via pandoc}}
 
 
-\title{\texttt{inlabru} Workshop}
+\title{Spatio-temporal models with \texttt{inlabru}}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Noumea (New Caledonia) 10-14 March 2026}
 \author{Jafet Belmont, Sara Martino and Janine Illian}
 \date{}
 \begin{document}
@@ -281,7 +288,7 @@
 \begin{itemize}
 \tightlist
 \item
-  Welcome to the \texttt{inlabru} workshop!
+  Welcome to the \texttt{inlabru} workshop in New Caledonia!
 \item
   The aim of this workshop is to introduce you to a range of statistical
   modelling approaches, in particular the temporal, spatial and
@@ -291,7 +298,7 @@
   Workshop materials are available in the github repository
 \end{itemize}
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, colbacktitle=quarto-callout-warning-color!10!white, bottomtitle=1mm, bottomrule=.15mm, toprule=.15mm, colback=white, breakable, left=2mm, arc=.35mm, opacitybacktitle=0.6, title=\textcolor{quarto-callout-warning-color}{\faExclamationTriangle}\hspace{0.5em}{Important! ⚠️}, toptitle=1mm, colframe=quarto-callout-warning-color-frame, titlerule=0mm, coltitle=black, leftrule=.75mm, opacityback=0]
+\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-warning-color-frame, arc=.35mm, title=\textcolor{quarto-callout-warning-color}{\faExclamationTriangle}\hspace{0.5em}{Important! ⚠️}, coltitle=black, left=2mm, colback=white, rightrule=.15mm, opacitybacktitle=0.6, colbacktitle=quarto-callout-warning-color!10!white, bottomrule=.15mm, bottomtitle=1mm, leftrule=.75mm, opacityback=0, titlerule=0mm, breakable, toprule=.15mm, toptitle=1mm]
 
 Please use the instructions provided \href{Install_software.qmd}{here}
 to install and check your installation \emph{before} the course start.
