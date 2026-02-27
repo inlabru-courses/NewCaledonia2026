@@ -842,8 +842,91 @@ p = predict(object = fit, newdata = c(), ~ data.frame(int = Intercept_latent,
 
 
 
+# Manipulating posterior marginals 
+
+## Manipulating posterior marginals 
+
+We can be interested in functions of the posterior marginals that are computed by the `bru()` function.
+
+For example, we might want to :
+
+- compute the mean of a posterior marginal
+- compute the median of a posterior marginal
+- sample from the posterior marginal
+- ...
+
+All this can be done with the help of the `inla.*marginal()` family of functions
+
+## Example from the Tokyo example
+
+Obtain the posterior marginal for the _standard deviation_ of the random effect, compute it's mean and median and sample from it.
 
 
+:::: {.columns}
+
+::: {.column width="50%"}
+
+::: {style="font-size:0.7em;"}
+
+
+```{r}
+#| echo: true
+post_prec = fit$marginals.hyperpar$`Precision for time`
+post_sd = inla.tmarginal(fun = function(x) 
+                          1/sqrt(x), 
+                         post_prec)
+post_sd_mode = inla.mmarginal(post_sd)
+post_sd_mean = inla.emarginal(fun =function(x)x, post_sd )
+post_sd_sample = inla.rmarginal(1000, post_sd)
+
+
+```
+
+:::
+
+:::
+
+::: {.column width="50%"}
+::: {style="font-size:0.7em;"}
+
+```{r}
+#| echo: true
+#| fig-width: 8
+#| fig-height: 8
+ggplot() + geom_line(data = post_sd, aes(x,y))  +
+  geom_histogram(data = data.frame(samples = post_sd_sample), 
+                 aes(x = samples, y = after_stat(density)),      
+                 color = "black", fill = "lightblue")+
+  geom_vline(xintercept = post_sd_mode, color = "red") + 
+    geom_vline(xintercept = post_sd_mean, color = "blue") 
+
+```
+:::
+:::
+::::
+
+
+
+
+
+
+
+## The `inla.*marginal()` family
+
+::: {style="font-size:0.5em;"}
+| **Function Name** | **Usage** |
+|-------------------|-----------|
+| `inla.dmarginal(x, marginal, ...)` | Density at a vector of evaluation points $x$ |
+| `inla.pmarginal(q, marginal, ...)` | Distribution function at a vector of quantiles *q* |
+| `inla.qmarginal(p, marginal, ...)` | Quantile function at a vector of probabilities *p* |
+| `inla.rmarginal(n, marginal)` | Generate *n* random deviates |
+| `inla.hpdmarginal(p, marginal, ...)` | Compute the highest posterior density interval at level *p* |
+| `inla.emarginal(fun, marginal, ...)` | Compute the expected value assuming transformation given by *fun* |
+| `inla.mmarginal(marginal)` | Computes the mode |
+| `inla.smarginal(marginal, ...)` | Smoothed density (returns x-values and interpolated y-values) |
+| `inla.tmarginal(fun, marginal, ...)` | Transform the marginal using function *fun* |
+| `inla.zmarginal(marginal)` | Summary statistics for the marginal |
+:::
 
 # `NA`s in `inlabru`
 

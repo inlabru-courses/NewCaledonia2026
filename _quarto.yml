@@ -12,6 +12,7 @@ project:
   - slides/slides_Closing_Remarks.qmd
   
   - practicals/LMM_ex.qmd
+  - practicals/GLMM_fit.qmd
   - day2_practical_3.qmd
   - day2_practical_4.qmd
   - day3_practical_5.qmd
@@ -62,6 +63,8 @@ website:
       menu:
       - text: Practical 1 - Fit LMM
         href: practicals/LMM_ex.qmd
+      - text: Practical 2 - Fit GLMM
+        href: practicals/GLMM_fit.qmd
       - text: Practical 3 - Temporal Models
         href: day2_practical_3.qmd
       - text: Practical 4 - Spatial Data Types
@@ -74,6 +77,8 @@ website:
         href: day4_practical_7.qmd  
 format:
   html:
+    theme: flatly
+    respect-user-color-scheme: false
     css: include/webex.css
     include-after-body: include/webex.js
     toc: true

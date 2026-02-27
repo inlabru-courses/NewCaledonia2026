@@ -65,7 +65,7 @@ No knowledge of `R-INLA` or `inlabru` is required.
 | 13:00 - 14:30 | Lunch break 🍽️ |
 | 14:30 - 15:30 | [Practical Session 1](practicals/LMM_ex.qmd) |
 | 15:30 - 15:45 | Coffee Break ☕ |
-| 15:45 - 16:45 | [Practical Session 2](practicals/LMM_ex.qmd) |
+| 15:45 - 16:45 | [Practical Session 2](practicals/GLMM_fit.qmd) |
 | 16:45 - 17:00 | wrap-up and outlook |
 
 
@@ -143,6 +143,6 @@ https://inlabru-courses.github.io/NewCaledonia2026/
    title = {inlabruCourseMarch2026: Course Materials for Noumea inlabru Course 10-14 March 2026},
    author = {Belmont, Jafet and Martino, Sara and Illian, Janine},
    year = {2026},
-   url = {…}
+   url = {https://inlabru-courses.github.io/NewCaledonia2026/}
 }
 ```

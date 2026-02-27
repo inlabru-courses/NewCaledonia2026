@@ -291,7 +291,7 @@
 \@ifundefined{codebgcolor}{\definecolor{codebgcolor}{named}{light}}{}
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[sharp corners, colback={codebgcolor}, frame hidden, enhanced, boxrule=0pt, breakable]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, boxrule=0pt, frame hidden, sharp corners, colback={codebgcolor}, enhanced]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -338,7 +338,7 @@
   Workshop materials are available in the github repository
 \end{itemize}
 
-\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, arc=.35mm, colframe=quarto-callout-warning-color-frame, bottomrule=.15mm, breakable, colbacktitle=quarto-callout-warning-color!10!white, titlerule=0mm, opacitybacktitle=0.6, rightrule=.15mm, bottomtitle=1mm, title=\textcolor{quarto-callout-warning-color}{\faExclamationTriangle}\hspace{0.5em}{Important! ⚠️}, leftrule=.75mm, left=2mm, toprule=.15mm, opacityback=0, colback=white, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, coltitle=black, colframe=quarto-callout-warning-color-frame, opacityback=0, colback=white, bottomrule=.15mm, colbacktitle=quarto-callout-warning-color!10!white, rightrule=.15mm, title=\textcolor{quarto-callout-warning-color}{\faExclamationTriangle}\hspace{0.5em}{Important! ⚠️}, bottomtitle=1mm, breakable, toprule=.15mm, titlerule=0mm, toptitle=1mm, arc=.35mm, leftrule=.75mm, left=2mm, opacitybacktitle=0.6]
 
 Please use the instructions provided \href{Install_software.qmd}{here}
 to install and check your installation \emph{before} the course start.
@@ -404,7 +404,7 @@ practical tips on \texttt{inlabru}} \\
 13:00 - 14:30 & Lunch break 🍽️ \\
 14:30 - 15:30 & \href{practicals/LMM_ex.qmd}{Practical Session 1} \\
 15:30 - 15:45 & Coffee Break ☕ \\
-15:45 - 16:45 & \href{practicals/LMM_ex.qmd}{Practical Session 2} \\
+15:45 - 16:45 & \href{practicals/GLMM_fit.qmd}{Practical Session 2} \\
 16:45 - 17:00 & wrap-up and outlook \\
 \end{longtable}
 
@@ -517,7 +517,7 @@ Belmont J., Martino S., Illian, J. F (2026).
    \DataTypeTok{title}\NormalTok{ = \{inlabruCourseMarch2026: Course Materials for Noumea inlabru Course 10{-}14 March 2026\},}
    \DataTypeTok{author}\NormalTok{ = \{Belmont, Jafet and Martino, Sara and Illian, Janine\},}
    \DataTypeTok{year}\NormalTok{ = \{2026\},}
-   \DataTypeTok{url}\NormalTok{ = \{…\}}
+   \DataTypeTok{url}\NormalTok{ = \{https://inlabru{-}courses.github.io/NewCaledonia2026/\}}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
