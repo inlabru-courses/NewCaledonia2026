@@ -1,7 +1,7 @@
 ---
 title: "Spatio-temporal models with `inlabru`"
 author: "Jafet Belmont, Sara Martino and Janine Illian"
-subtitle: "Noumea (New Caledonia) 10-14 March 2026"
+subtitle: "Noumea (New Caledonia) 9-12 March 2026"
 format: 
   html:
     mainfont: "12"
