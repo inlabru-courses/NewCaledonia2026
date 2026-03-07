@@ -988,7 +988,7 @@ p_int = fit$marginals.fixed$beta0 %>% ggplot() + geom_line(aes(x,y)) +
 
 p_cov = fit$marginals.fixed$beta1 %>% ggplot() + geom_line(aes(x,y)) +
   geom_line(data = prior, aes(x,y), linetype= "dashed") + xlab("") + ylab("") +
-  ggtitle("Covariate") + coord_cartesian(xlim = c(0.5,0.8))
+  ggtitle("Covariate") + coord_cartesian(xlim = c(0,0.005))
 
 
 preds = predict(fit, data.frame(tl = seq(90,165)), ~ beta0 + beta1)
@@ -1497,7 +1497,8 @@ We observed larynx cancer mortality counts for males in 544 district of Germany 
 #| warning: false
 #| message: false
 #|
-my.germany.map = function(data, cutpoints=seq(min(data),max(data),length=256), autoscale=FALSE, legend=TRUE, append=FALSE)
+my.germany.map = function(data, cutpoints=seq(min(data),max(data),length=256), 
+                          autoscale=FALSE, legend=TRUE, append=FALSE)
 {
   if (autoscale)
   {
@@ -1540,7 +1541,7 @@ data(Germany)
 # Load data
 Germany$region.struct = Germany$region
 g <- system.file("demodata/germany.graph" , package = "INLA")
-my.germany.map(Germany$Y/Germany$E, autoscale = F)
+my.germany.map(Germany$Y/Germany$E, autoscale = T)
 ```
 :::
 :::::
@@ -2017,8 +2018,18 @@ fit$summary.random$depth_smooth %>%
                   ymax = `0.975quant`), alpha = 0.5) +
   geom_point(data = df, aes(x = log(depth), y =-12), shape  = "|") +
   xlab("Depth") + ylab("") + ggtitle("Smooth effect of depth")
+```
 
+## `inlabru` for geostatistics
 
+```{r}
+
+theme_map   = theme(axis.title.x=element_blank(),
+                    axis.text.x=element_blank(),
+                    axis.ticks.x=element_blank(),
+                    axis.title.y=element_blank(),
+                    axis.text.y=element_blank(),
+                    axis.ticks.y=element_blank())
 
 preds = predict(fit, depth_sf, ~ data.frame(cov = depth_smooth,
                                             space = space,
@@ -2026,14 +2037,22 @@ preds = predict(fit, depth_sf, ~ data.frame(cov = depth_smooth,
                                             prob = inla.link.logit(Intercept + space + depth_smooth,
                                                                    inverse = T)))
 
-ggplot() +
+p1 = ggplot() +
   geom_tile(data = preds$prob, aes(x = st_coordinates(depth_sf)[,1],
                             y = st_coordinates(depth_sf)[,2],
                             fill = mean))+ scale_fill_scico(direction = -1)+
-  geom_sf(data = df, pch = ".") +
+  geom_sf(data = df, pch = ".") +theme_map + 
   xlab("") + ylab("") + ggtitle("Predicted probability")
 
 
+p2 = ggplot() +
+  geom_tile(data = preds$prob , aes(x = st_coordinates(depth_sf)[,1],
+                            y = st_coordinates(depth_sf)[,2],
+                            fill = sd/mean))+ scale_fill_scico(direction = -1)+
+  geom_sf(data = df, pch = ".") + theme_map + 
+  xlab("") + ylab("") + ggtitle("Coefficient of Variation")
+
+p1 + p2
 
 ```
 

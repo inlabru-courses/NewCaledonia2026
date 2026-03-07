@@ -344,7 +344,7 @@ $$
 $$
 
 
-The **precision matrix** is inverse of the *covariance matrix**
+The **precision matrix** is inverse of the **covariance matrix**
 
 $$
 \mathbf{Q} = \mathbf{\Sigma}^{-1}
