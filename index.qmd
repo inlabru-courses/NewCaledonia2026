@@ -59,7 +59,7 @@ No knowledge of `R-INLA` or `inlabru` is required.
 
 | Time | Topic |
 |:----------------------------------:|:----------------------------------:|
-| 10:00 - 10:30 | Welcome |
+| 10:00 - 10:30 | [**Welcome  and intro to the course**](Slides_Janine_pdf/intro_slides_inlabru_course.pdf) |
 | 10:30 - 11:30 | [**Session 1**: Introduction to `inlabru`](slides/slides_1.html) |
 | 11:30 - 13:00 | [**Session 2**: Some practical tips on `inlabru`](slides/slides_2.html) |
 | 13:00 - 14:30 | Lunch break 🍽️ |
