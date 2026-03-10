@@ -9,8 +9,8 @@ project:
   - slides/slides_3.qmd
   - slides/slides_spatioTemporal.qmd
   - slides/slides_Model_Comparison.qmd
-  - slides/slides_Closing_Remarks.qmd
-  
+  - slides/slides_Model_Comparison.qmd
+  - slides/slides_Zero_Inflated.qmd
   - practicals/LMM_ex.qmd
   - practicals/GLMM_fit.qmd
   - day2_practical_3.qmd
@@ -18,6 +18,7 @@ project:
   - day3_practical_5.qmd
   - day4_practical_6.qmd  
   - day4_practical_7.qmd  
+  - practical_zero_inflated.qmd  
 website:
   title: inlabru Workshop
   navbar:
@@ -59,6 +60,8 @@ website:
         href: slides/slides_Model_Comparison.qmd
       - text: Slides 10 - Multiple Likelihoods Models
         href: Slides_Janine_pdf/slides_session_10_inlabru.pdf
+      - text: Slides 11 - Zero Inflated Models
+        href: slides/slides_Zero_Inflated.qmd
         target: _blank
 
     - text: Practicals
@@ -77,6 +80,8 @@ website:
         href: day4_practical_6.qmd  
       - text: Practical 7 - Multiple Likelihoods Models
         href: day4_practical_7.qmd  
+      - text: Practical 8 - Zero Inflated Models
+        href: practical_zero_inflated.qmd  
 format:
   html:
     theme: flatly

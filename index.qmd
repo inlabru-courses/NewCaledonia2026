@@ -109,7 +109,8 @@ No knowledge of `R-INLA` or `inlabru` is required.
 | Time | Topic |
 |:----------------------------------:|:----------------------------------:|
 | 8:00 - 9:00 | [**Session 10**: Multi-likelihood/joint likelihood models](Slides_Janine_pdf/slides_10_inlabru.pdf)  |
-|                |[Practical Session 7](day4_practical_7.qmd) |
+| 9:00 - 10:00  |[Practical Session 7](day4_practical_7.qmd) |
+|10:00 - 11:00 | [**Session 11**: Zero Inflated Models](slides/slides_Zero_Inflated.qmd) 
 | 12:00 - 13:00 | Lunch ☕ |
 | 13:00 - 14:00 | [Practical Session 7](day4_practical_7.qmd) |
 | 14:00 - 15:00 | [Closing session](slides/slides_Closing_Remarks.qmd) and discussion|

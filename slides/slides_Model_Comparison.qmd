@@ -7,6 +7,7 @@ format:
     margin: 0
     logo:  NTNU_UofG.png
     theme: uofg_theme.scss
+    footer: "<a href='../index.html'>Back to Home</a>"
     header-includes: |
       <script src="custom.js" type="application/javascript"></script>
 slide-number: "c/t"
@@ -35,6 +36,7 @@ execute:
   allow-html: true
   freeze: auto
 ---
+
 
 ```{r setup}
 # #| include: false
@@ -478,6 +480,7 @@ A better option is to use posterior predictive checks[^3]
 
 [^3]: See Gelman et. al (2020) "Bayesian Workflow"
 
+
 ## One example of posterior predictive checks
 
 ::::: columns
@@ -519,6 +522,7 @@ p1 = predict(fit, df, ~ Intercept + cov)
 p2 = predict(fit1, df, ~ Intercept + cov)
 
 ```
+
 
 ```{r}
 #| echo: false
@@ -588,7 +592,8 @@ colnames(mat_display) <- c("1", "2", "3", "4", "...", "M")
 knitr::kable(
   mat_display,
   align = "c",
-  caption = ""
+  caption = "",
+  escape = FALSE
 )%>% 
   kableExtra::add_header_above(c(" " = 1, "Samples" = ncol(mat_display))) %>%
   kableExtra::kable_styling(full_width = FALSE, position = "center")
