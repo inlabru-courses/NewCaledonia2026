@@ -291,7 +291,7 @@
 \@ifundefined{codebgcolor}{\definecolor{codebgcolor}{named}{light}}{}
 \makeatother
 \makeatletter
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, colback={codebgcolor}, enhanced, frame hidden, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, enhanced, colback={codebgcolor}, sharp corners, boxrule=0pt, breakable]}{\end{tcolorbox}}\fi
 \makeatother
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
@@ -413,7 +413,7 @@ indexes the combination \(ijk\) of individuals per brood per year.
 
 now we can fit the model.
 
-\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, leftrule=.75mm, toptitle=1mm, opacitybacktitle=0.6, colback=white, title={Task}, breakable, bottomtitle=1mm, colframe=quarto-callout-warning-color-frame, colbacktitle=quarto-callout-warning-color!10!white, titlerule=0mm, arc=.35mm, bottomrule=.15mm, rightrule=.15mm, left=2mm, opacityback=0, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, title={Task}, opacityback=0, breakable, bottomrule=.15mm, toptitle=1mm, opacitybacktitle=0.6, bottomtitle=1mm, colback=white, left=2mm, colbacktitle=quarto-callout-warning-color!10!white, coltitle=black, leftrule=.75mm, colframe=quarto-callout-warning-color-frame, titlerule=0mm, arc=.35mm, toprule=.15mm]
 
 Complete the code to fit the model in Equation~\ref{eq-linpred}. You
 need to define the components, the likelihood and finaly use the
@@ -456,7 +456,7 @@ Click here to see the solution
 
 Now we can check the results.
 
-\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, leftrule=.75mm, toptitle=1mm, opacitybacktitle=0.6, colback=white, title={Task}, breakable, bottomtitle=1mm, colframe=quarto-callout-warning-color-frame, colbacktitle=quarto-callout-warning-color!10!white, titlerule=0mm, arc=.35mm, bottomrule=.15mm, rightrule=.15mm, left=2mm, opacityback=0, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, title={Task}, opacityback=0, breakable, bottomrule=.15mm, toptitle=1mm, opacitybacktitle=0.6, bottomtitle=1mm, colback=white, left=2mm, colbacktitle=quarto-callout-warning-color!10!white, coltitle=black, leftrule=.75mm, colframe=quarto-callout-warning-color-frame, titlerule=0mm, arc=.35mm, toprule=.15mm]
 
 Plot the posterior distribution of the fixed effects: \(\beta\) and
 \(\alpha_k\).
@@ -485,7 +485,7 @@ Click here to see the solution
 
 We now want to look at the hyperparameters of the model
 
-\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, leftrule=.75mm, toptitle=1mm, opacitybacktitle=0.6, colback=white, title={Task}, breakable, bottomtitle=1mm, colframe=quarto-callout-warning-color-frame, colbacktitle=quarto-callout-warning-color!10!white, titlerule=0mm, arc=.35mm, bottomrule=.15mm, rightrule=.15mm, left=2mm, opacityback=0, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, title={Task}, opacityback=0, breakable, bottomrule=.15mm, toptitle=1mm, opacitybacktitle=0.6, bottomtitle=1mm, colback=white, left=2mm, colbacktitle=quarto-callout-warning-color!10!white, coltitle=black, leftrule=.75mm, colframe=quarto-callout-warning-color-frame, titlerule=0mm, arc=.35mm, toprule=.15mm]
 
 Plot the posterior estimated of the standard deviation
 \(\sigma_e = \sqrt{1/\tau_e}\) and
@@ -625,7 +625,7 @@ relative components as:
 \end{Highlighting}
 \end{Shaded}
 
-\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, leftrule=.75mm, toptitle=1mm, opacitybacktitle=0.6, colback=white, title={Task}, breakable, bottomtitle=1mm, colframe=quarto-callout-warning-color-frame, colbacktitle=quarto-callout-warning-color!10!white, titlerule=0mm, arc=.35mm, bottomrule=.15mm, rightrule=.15mm, left=2mm, opacityback=0, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, title={Task}, opacityback=0, breakable, bottomrule=.15mm, toptitle=1mm, opacitybacktitle=0.6, bottomtitle=1mm, colback=white, left=2mm, colbacktitle=quarto-callout-warning-color!10!white, coltitle=black, leftrule=.75mm, colframe=quarto-callout-warning-color-frame, titlerule=0mm, arc=.35mm, toprule=.15mm]
 
 Run the model again using 0.1 as default precision for the altitude
 slope parameter and for the \texttt{year} fixed effect
@@ -694,7 +694,7 @@ visualize the posterior density of the slope \(\beta\) we can type:
 \pandocbounded{\includegraphics[keepaspectratio]{GLMM_fit_files/figure-pdf/unnamed-chunk-13-1.pdf}}
 \end{center}
 
-\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, leftrule=.75mm, toptitle=1mm, opacitybacktitle=0.6, colback=white, title={Task}, breakable, bottomtitle=1mm, colframe=quarto-callout-warning-color-frame, colbacktitle=quarto-callout-warning-color!10!white, titlerule=0mm, arc=.35mm, bottomrule=.15mm, rightrule=.15mm, left=2mm, opacityback=0, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, title={Task}, opacityback=0, breakable, bottomrule=.15mm, toptitle=1mm, opacitybacktitle=0.6, bottomtitle=1mm, colback=white, left=2mm, colbacktitle=quarto-callout-warning-color!10!white, coltitle=black, leftrule=.75mm, colframe=quarto-callout-warning-color-frame, titlerule=0mm, arc=.35mm, toprule=.15mm]
 
 Plot the posterior marginals for the precision of brood and individual
 random effect \(\pi(\tau_e|y)\)

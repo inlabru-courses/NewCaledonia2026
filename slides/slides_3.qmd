@@ -667,7 +667,7 @@ $$
   \right) = \exp\!\left(-\tfrac{1}{2} \, \mathbf{u}^{\top} \mathbf{Q}\ \mathbf{u}\right)
 $$
 
-Important things to understand (not just for RW1 mdoels!):
+Important things to understand (not just for RW1 models!):
 
 1.  The (sparse) precision matrix
 2.  Role of the precision parameter $\tau$ and prior distribution
@@ -705,7 +705,7 @@ so parameters are not well-defined.
 **Solution:**
 
 -   Sum to zero constraint $\sum_{i = 1}^n u_i = 0$
--   This is included in the model be default
+-   This is included in the model by default
 :::
 :::::
 
@@ -1112,7 +1112,7 @@ rbind(cbind(pred1, model = "rw1"),
 
 ## Continuous time modelling {.smaller}
 
--   Sometimes the data are not collected at discrete time points but over continous time
+-   Sometimes the data are not collected at discrete time points but over continuous time
 
 -   One solution (not a bad one usually) is to discretize the time and use RW model (AR models are then harder to justify..)
 
@@ -1122,7 +1122,7 @@ rbind(cbind(pred1, model = "rw1"),
 
 What is this?
 
--   Is a process defined everywhere in the time domain $\mathcal{T}$ such that, if i take $n$ points $t_1,t_2,\dots,t_n$ then
+-   It is a process defined everywhere in the time domain $\mathcal{T}$ such that, if i take $n$ points $t_1,t_2,\dots,t_n$ then
 
 $$
 (\omega(t_1),\omega(t_2),\dots,\omega(t_n))\sim\mathcal{N}(\mathbf{0},\mathbf{\Sigma}_{\omega(t_1),\omega(t_2),\dots,\omega(t_n)} ), \qquad \text{ for any } t_1,t_2,\dots,t_n\in\mathcal{T}
@@ -1142,7 +1142,7 @@ Covariance matrices are not nice objects!
 
 ## The SPDE approach
 
-We define a (Matern) GRF as the solution of a stochastic partial differential equation (SPDE)
+We define a (Matérn) GRF as the solution of a stochastic partial differential equation (SPDE)
 
 $$
 (\kappa^2-\Delta)^{\alpha/2}\omega(t) = W(t)
@@ -1152,7 +1152,7 @@ What is this?
 
 -   $W(t)$ is random noise
 -   $\omega(t)$ is the smooth process we want
--   $(\kappa^2-\Delta)^{\alpha/2}$ is an operator that "smooths" the white noise.
+-   $(\kappa^2-\Delta)^{\alpha/2}$ is an operator that "smoothes" the white noise.
 -   $\kappa$ and $\alpha$ are parameters
 
 ## One analogy.. {.smaller}
@@ -1166,7 +1166,7 @@ What is this?
 
 . . .
 
--   But the rope has tension and stifness
+-   But the rope has tension and stiffness
 
     -   the tension spreads each tap to nearby points.
     -   Sharp jumps are softened.
@@ -1326,7 +1326,7 @@ w = round(runif(7), 3)
 
 ## In summary {.smaller}
 
--   The continuous Matern GRF is the solution of a SPDE and is represented as
+-   The continuous Matérn GRF is the solution of an SPDE and is represented as
 
 $$
 \omega(t) = \sum_{i = 1}^T\phi_i(t)w_i
@@ -1357,7 +1357,7 @@ For the **range** we have: $$
 $$
 
 For the **marginal standard deviation** we have: $$
-\text{Prob}(\sigma<\sigma_0) = p_{\sigma}
+\text{Prob}(\sigma > \sigma_0) = p_{\sigma}
 $$
 
 ## PC priors for range and marginal variance

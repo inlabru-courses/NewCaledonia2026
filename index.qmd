@@ -76,12 +76,12 @@ No knowledge of `R-INLA` or `inlabru` is required.
 
 | Time | Topic |
 |:----------------------------------:|:----------------------------------:|
-| 8:00 - 9:15 | [**Session 3 cont.**: Time Series Models](slides/slides_3.html) |
-| 9:15 - 11:00 | [Practical Session 3](day2_practical_3.html) |
-| 11:00 - 12:00 | [**Session 4**: Introduction to Spatial Statistics](Slides_Janine_pdf/slides_4_inlabru.pdf) |
-| 12:00 - 13:00 | Lunch break 🍽️ |
-| 13:00 - 14:00 |  [Practical Session 4](day2_practical_4.html)  |
-|14.00 - 15:00 | [**Session 5**: Areal processes](Slides_Janine_pdf/slides_5_inlabru.pdf) |
+| 8:00 - 9:00 | [**Session 3 cont.**: Time Series Models](slides/slides_3.html) |
+| 9:00 - 11:00 | [Practical Session 3](day2_practical_3.html) |
+| 11:00 - 12:00 | [**Session 4**: Introduction to Spatial Statistics](Slides_Janine_pdf/slides_session_4_inlabru.pdf) |
+| 12:00 - 13:00 | Lunch |
+|13:00 - 14:00 | [**Session 5**: Areal processes](Slides_Janine_pdf/slides_5_inlabru.pdf) |
+|14.00 - 15:00 |  [**Session 6**: Geostatistics](Slides_Janine_pdf/slides_6_inlabru.pdf) |
 
 
 ### Day 3
@@ -91,12 +91,13 @@ No knowledge of `R-INLA` or `inlabru` is required.
 
 | Time | Topic |
 |:----------------------------------:|:----------------------------------:|
-| 8:00 - 09:00 | [**Session 6**: Geostatistics](Slides_Janine_pdf/slides_6_inlabru.pdf) |
-| 09:15 - 11:00 |  [Practical Session 5](day3_practical_5.html) |
-| 11:00 - 12:00 |  [**Session 7**: Point Processes](Slides_Janine_pdf/slides_7_inlabru.pdf) |
+| 8:00 - 09:00 | [**Session 7**: Point Processes](Slides_Janine_pdf/slides_7_inlabru.pdf) |
+| 09:00 - 11:00 |  [Practical Session 4](day2_practical_4.html) |
+|               |  [Practical Session 5](day3_practical_5.html) |
+| 11:00 - 12:00 |  [**Session 8**: Spatiotemporal models](slides/slides_spatioTemporal.qmd)  |
 | 12:00 - 13:00 | Lunch break 🍽️ |
-| 13:00 - 14:00 | [Practical Session 5 (continued)](day3_practical_5.html) |
-| 14:00 - 15:00 | [**Session 8**: Spatiotemporal models](slides/slides_spatioTemporal.qmd)  |
+| 13:00 - 14:00 | [**Session 9**: Model comparison and evaluation](slides/slides_Model_Comparison.qmd) |
+| 14:00 - 15:00 | [Practical Session 6](day4_practical_6.qmd) |
 
 
 
@@ -107,9 +108,8 @@ No knowledge of `R-INLA` or `inlabru` is required.
 
 | Time | Topic |
 |:----------------------------------:|:----------------------------------:|
-| 8:00 - 9:00 | [**Session 9**: Model comparison and evaluation](slides/slides_Model_Comparison.qmd) |
-| 09:15 - 11:00 | [Practical Session 6](day4_practical_6.qmd) |
-| 11:00 - 12:00 | [**Session 10**: Multi-likelihood/joint likelihood models](Slides_Janine_pdf/slides_10_inlabru.pdf) |
+| 8:00 - 9:00 | [**Session 10**: Multi-likelihood/joint likelihood models](Slides_Janine_pdf/slides_10_inlabru.pdf)  |
+|                |[Practical Session 7](day4_practical_7.qmd) |
 | 12:00 - 13:00 | Lunch ☕ |
 | 13:00 - 14:00 | [Practical Session 7](day4_practical_7.qmd) |
 | 14:00 - 15:00 | [Closing session](slides/slides_Closing_Remarks.qmd) and discussion|
