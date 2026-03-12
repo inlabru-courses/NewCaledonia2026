@@ -597,11 +597,6 @@ knitr::kable(
 )%>% 
   kableExtra::add_header_above(c(" " = 1, "Samples" = ncol(mat_display))) %>%
   kableExtra::kable_styling(full_width = FALSE, position = "center")
-
-
-
-
-
 ```
 
 2.  Compare some summaries of the simulated data with the one of the observed one
